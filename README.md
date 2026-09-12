@@ -142,7 +142,7 @@ git push origin 닉네임
 예시
 
 ```bash
-git push origin tellie
+git push origin haechi
 ```
 
 <br />

@@ -58,5 +58,3 @@ Thumbs.db
 ### Logs / Cache ###
 *.log
 .cache/
-
-.DS_Store

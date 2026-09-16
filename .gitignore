@@ -58,3 +58,6 @@ Thumbs.db
 ### Logs / Cache ###
 *.log
 .cache/
+
+node_modules/
+dist/

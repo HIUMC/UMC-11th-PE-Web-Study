@@ -1,48 +1,53 @@
-# 1주차 백엔드 - ERD 설계
+# 1주차 Backend Mission - 리워드 서비스 ERD 설계
 
-## 1. 과제 개요
+## 1. 서비스 소개
 
-온라인 도서 대여 관리 시스템의 요구사항을 분석하고, 필요한 데이터를 테이블로 분리하여 ERD를 설계하였다.
+각 지역별로 가게들이 존재하며, 사용자가 가게의 미션을 수행하고 포인트를 모으는 리워드 서비스의 데이터베이스를 설계하였다.
 
-주요 기능은 다음과 같다.
+### 핵심 규칙
 
-- 카카오 소셜 로그인
-- 회원 정보 관리 및 회원 탈퇴
-- 도서 및 카테고리 관리
-- 도서 대여
-- 도서 해시태그
-- 도서 좋아요
-- 알림 관리
+- 지역별로 여러 가게가 존재한다.
+- 각 가게에는 여러 미션이 존재한다.
+- 회원은 여러 미션을 수행할 수 있다.
+- 각 지역에서 미션 10개를 완료하면 1,000 Point를 지급한다.
+- 동일한 지역의 보상은 한 번만 받을 수 있다.
 
 ---
 
-## 2. 요구사항 분석
+## 2. 요구사항
 
-### 사용자
+### 로그인 / 회원가입
 
-- 카카오 소셜 로그인을 지원한다.
-- 이름, 닉네임, 전화번호, 성별 정보를 저장한다.
-- 회원 탈퇴 기능을 지원한다.
+- 소셜 로그인을 지원한다.
+- 회원의 소셜 로그인 정보를 저장한다.
+- 동일한 소셜 계정으로 중복 가입할 수 없도록 한다.
 
-회원 탈퇴 시 데이터를 바로 삭제하지 않고 `deleted_at`을 이용한 Soft Delete 방식을 사용하였다.
+### 지역 / 가게
 
-### 책
+- 여러 지역이 존재한다.
+- 하나의 지역에는 여러 가게가 존재할 수 있다.
+- 가게는 하나의 음식 카테고리에 속한다.
 
-- 한 사용자는 여러 책을 대여할 수 있다.
-- 책은 하나의 카테고리에 속한다.
-- 책은 제목과 설명 정보를 가진다.
-- 하나의 책에는 여러 해시태그가 붙을 수 있다.
-- 하나의 해시태그 역시 여러 책에 사용될 수 있다.
-- 사용자는 책에 좋아요를 누를 수 있다.
-- 카테고리별 책 개수를 조회할 수 있어야 한다.
+### 미션
 
-### 알림
+- 하나의 가게에는 여러 미션이 존재할 수 있다.
+- 한 회원은 여러 미션을 수행할 수 있다.
+- 하나의 미션도 여러 회원이 수행할 수 있다.
+- 회원별 미션 진행 상태와 완료 시점을 저장한다.
 
-알림은 다음과 같이 구분할 수 있다.
+### 지역 보상
 
-- 공지 알림
-- 책 반납 시간 임박 알림
-- 마케팅 알림
+- 한 지역에서 미션 10개를 완료하면 1,000 Point를 지급한다.
+- 동일한 회원에게 같은 지역 보상이 중복 지급되지 않도록 한다.
+
+### 이번 설계에서 제외한 기능
+
+미션 요구사항에 따라 다음 기능은 설계 대상에서 제외하였다.
+
+- 지도 및 검색 기능
+- 포인트 내역 관리
+- 알림 설정
+- 사장님의 점포 관리 기능
 
 ---
 
@@ -56,56 +61,73 @@
 
 | 테이블 | 역할 |
 | --- | --- |
-| `member` | 회원 및 카카오 로그인 정보 저장 |
-| `category` | 도서 카테고리 정보 저장 |
-| `book` | 도서 정보 저장 |
-| `rental` | 회원의 도서 대여 내역 저장 |
-| `hashtag` | 해시태그 정보 저장 |
-| `book_hashtag` | 도서와 해시태그의 N:M 관계 처리 |
-| `book_like` | 회원과 도서 좋아요의 N:M 관계 처리 |
-| `notification` | 회원별 알림 정보 저장 |
+| `member` | 회원 및 소셜 로그인 정보 관리 |
+| `region` | 지역 정보 관리 |
+| `food_category` | 가게 음식 카테고리 관리 |
+| `store` | 지역별 가게 정보 관리 |
+| `mission` | 가게별 미션 정보 관리 |
+| `member_mission` | 회원의 미션 수행 내역 관리 |
+| `member_region_reward` | 회원의 지역별 보상 지급 내역 관리 |
 
 ---
 
 ## 5. 테이블 관계
 
-### category - book
+### region - store
 
-하나의 카테고리에는 여러 책이 존재할 수 있다.
+하나의 지역에는 여러 가게가 존재할 수 있다.
 
-`category 1 : N book`
+`region 1 : N store`
 
-### member - rental - book
+`store` 테이블의 `region_id`가 `region.id`를 참조한다.
 
-한 회원은 여러 책을 대여할 수 있고, 하나의 책 역시 시간에 따라 여러 회원에게 대여될 수 있다.
+---
 
-대여 시점과 반납 예정 시간 등을 저장하기 위해 `rental` 테이블을 별도로 구성하였다.
+### food_category - store
 
-`member 1 : N rental`
+하나의 음식 카테고리에는 여러 가게가 속할 수 있다.
 
-`book 1 : N rental`
+`food_category 1 : N store`
 
-### book - book_hashtag - hashtag
+`store` 테이블의 `food_category_id`가 `food_category.id`를 참조한다.
 
-책과 해시태그는 N:M 관계이다.
+---
 
-이를 직접 연결하지 않고 `book_hashtag` 매핑 테이블을 사용하였다.
+### store - mission
 
-`book 1 : N book_hashtag`
+하나의 가게에는 여러 개의 미션이 존재할 수 있다.
 
-`hashtag 1 : N book_hashtag`
+`store 1 : N mission`
 
-### member - book_like - book
+`mission` 테이블의 `store_id`가 `store.id`를 참조한다.
 
-회원과 책의 좋아요 관계 역시 N:M 관계이므로 `book_like` 테이블을 사용하였다.
+---
 
-같은 회원이 같은 책에 여러 번 좋아요를 생성하지 못하도록 UNIQUE 제약조건을 적용하였다.
+### member - mission
 
-### member - notification
+한 회원은 여러 미션을 수행할 수 있고, 하나의 미션도 여러 회원이 수행할 수 있기 때문에 N:M 관계가 발생한다.
 
-한 회원은 여러 개의 알림을 받을 수 있다.
+이를 직접 연결하지 않고 `member_mission` 매핑 테이블을 사용하였다.
 
-`member 1 : N notification`
+`member 1 : N member_mission`
+
+`mission 1 : N member_mission`
+
+따라서 전체적인 관계는 다음과 같다.
+
+`member N : M mission`
+
+---
+
+### member - region
+
+회원은 여러 지역의 보상을 받을 수 있고, 한 지역에서도 여러 회원이 보상을 받을 수 있다.
+
+따라서 회원과 지역 역시 N:M 관계이며, `member_region_reward` 테이블을 통해 관리하였다.
+
+`member 1 : N member_region_reward`
+
+`region 1 : N member_region_reward`
 
 ---
 
@@ -114,117 +136,117 @@
 ```sql
 CREATE TABLE member (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    kakao_id VARCHAR(100) NOT NULL,
-    name VARCHAR(50) NOT NULL,
-    nickname VARCHAR(50) NOT NULL,
-    phone_number VARCHAR(20) NOT NULL,
-    gender VARCHAR(10) NOT NULL,
+    social_type VARCHAR(20) NOT NULL,
+    social_id VARCHAR(100) NOT NULL,
+    nickname VARCHAR(30) NOT NULL,
+    point BIGINT NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP,
     deleted_at DATETIME NULL,
-    CONSTRAINT uq_member_kakao UNIQUE (kakao_id)
+
+    CONSTRAINT uq_member_social
+        UNIQUE (social_type, social_id)
 );
 
 
-CREATE TABLE category (
+CREATE TABLE region (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL
 );
 
 
-CREATE TABLE book (
+CREATE TABLE food_category (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    category_id BIGINT NOT NULL,
-    title VARCHAR(200) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL
+);
+
+
+CREATE TABLE store (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    region_id BIGINT NOT NULL,
+    food_category_id BIGINT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(200) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL,
+
+    CONSTRAINT fk_store_region
+        FOREIGN KEY (region_id)
+        REFERENCES region(id),
+
+    CONSTRAINT fk_store_food_category
+        FOREIGN KEY (food_category_id)
+        REFERENCES food_category(id)
+);
+
+
+CREATE TABLE mission (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    store_id BIGINT NOT NULL,
+    title VARCHAR(100) NOT NULL,
     description TEXT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP,
     deleted_at DATETIME NULL,
 
-    CONSTRAINT fk_book_category
-        FOREIGN KEY (category_id)
-        REFERENCES category(id)
+    CONSTRAINT fk_mission_store
+        FOREIGN KEY (store_id)
+        REFERENCES store(id)
 );
 
 
-CREATE TABLE rental (
+CREATE TABLE member_mission (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id BIGINT NOT NULL,
-    book_id BIGINT NOT NULL,
-    rented_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    due_at DATETIME NOT NULL,
-    returned_at DATETIME NULL,
+    mission_id BIGINT NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'IN_PROGRESS',
+    completed_at DATETIME NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_rental_member
+    CONSTRAINT fk_member_mission_member
         FOREIGN KEY (member_id)
         REFERENCES member(id),
 
-    CONSTRAINT fk_rental_book
-        FOREIGN KEY (book_id)
-        REFERENCES book(id)
+    CONSTRAINT fk_member_mission_mission
+        FOREIGN KEY (mission_id)
+        REFERENCES mission(id),
+
+    CONSTRAINT uq_member_mission
+        UNIQUE (member_id, mission_id)
 );
 
 
-CREATE TABLE hashtag (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL,
-
-    CONSTRAINT uq_hashtag_name UNIQUE (name)
-);
-
-
-CREATE TABLE book_hashtag (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    book_id BIGINT NOT NULL,
-    hashtag_id BIGINT NOT NULL,
-
-    CONSTRAINT fk_book_hashtag_book
-        FOREIGN KEY (book_id)
-        REFERENCES book(id),
-
-    CONSTRAINT fk_book_hashtag_hashtag
-        FOREIGN KEY (hashtag_id)
-        REFERENCES hashtag(id),
-
-    CONSTRAINT uq_book_hashtag
-        UNIQUE (book_id, hashtag_id)
-);
-
-
-CREATE TABLE book_like (
+CREATE TABLE member_region_reward (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     member_id BIGINT NOT NULL,
-    book_id BIGINT NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    region_id BIGINT NOT NULL,
+    reward_point INT NOT NULL DEFAULT 1000,
+    rewarded_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_book_like_member
+    CONSTRAINT fk_member_region_reward_member
         FOREIGN KEY (member_id)
         REFERENCES member(id),
 
-    CONSTRAINT fk_book_like_book
-        FOREIGN KEY (book_id)
-        REFERENCES book(id),
+    CONSTRAINT fk_member_region_reward_region
+        FOREIGN KEY (region_id)
+        REFERENCES region(id),
 
-    CONSTRAINT uq_book_like
-        UNIQUE (member_id, book_id)
-);
-
-
-CREATE TABLE notification (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    member_id BIGINT NOT NULL,
-    type VARCHAR(20) NOT NULL,
-    title VARCHAR(100) NOT NULL,
-    content TEXT NOT NULL,
-    is_read BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_notification_member
-        FOREIGN KEY (member_id)
-        REFERENCES member(id)
+    CONSTRAINT uq_member_region_reward
+        UNIQUE (member_id, region_id)
 );
 ```
 
@@ -232,65 +254,71 @@ CREATE TABLE notification (
 
 ## 7. 설계 포인트
 
-### 1. 회원 탈퇴는 Soft Delete 적용
+### 1. 회원과 미션의 N:M 관계 처리
 
-회원 탈퇴 시 데이터를 바로 삭제하지 않고 `deleted_at`에 탈퇴 시간을 저장하도록 설계하였다.
+회원 한 명은 여러 미션을 수행할 수 있고, 하나의 미션도 여러 회원이 수행할 수 있다.
 
-이를 통해 기존 대여 내역이나 좋아요 등의 데이터와 회원 간 관계를 유지할 수 있다.
+따라서 두 테이블을 직접 연결하지 않고 `member_mission` 테이블을 생성하여 N:M 관계를 해소하였다.
 
-### 2. N:M 관계는 매핑 테이블로 분리
+`member_mission`에는 단순한 관계뿐만 아니라 다음과 같은 미션 수행 정보도 저장한다.
 
-책과 해시태그, 회원과 책 좋아요처럼 양쪽 모두 여러 데이터를 가질 수 있는 경우 별도의 매핑 테이블을 사용하였다.
+- `status`: 미션 진행 상태
+- `completed_at`: 미션 완료 시점
 
-예를 들어 책과 해시태그의 경우 다음과 같이 구성하였다.
+---
 
-`book -> book_hashtag <- hashtag`
+### 2. 동일 미션 중복 수행 데이터 방지
 
-### 3. 중복 좋아요 및 해시태그 방지
-
-다음 UNIQUE 제약조건을 사용하였다.
-
-```sql
-UNIQUE (book_id, hashtag_id)
-```
-
-같은 책에 동일한 해시태그가 중복 등록되는 것을 방지한다.
+`member_mission`에는 다음 UNIQUE 제약조건을 적용하였다.
 
 ```sql
-UNIQUE (member_id, book_id)
+UNIQUE (member_id, mission_id)
 ```
 
-같은 회원이 동일한 책에 여러 번 좋아요를 생성하는 것을 방지한다.
+이를 통해 같은 회원과 같은 미션의 데이터가 여러 번 생성되는 것을 DB 레벨에서 방지하였다.
 
-### 4. 카테고리별 책 개수는 별도 저장하지 않음
+---
 
-카테고리별 책 개수는 `book` 데이터를 이용하여 계산할 수 있으므로 별도의 `book_count` 컬럼을 생성하지 않았다.
+### 3. 지역별 보상 중복 지급 방지
 
-예시는 다음과 같다.
+지역별 미션 완료 개수는 `member_mission`, `mission`, `store`를 이용하여 계산할 수 있다.
+
+하지만 미션 10개를 완료했을 때 1,000 Point를 이미 지급했는지 여부는 별도로 관리할 필요가 있다.
+
+따라서 `member_region_reward` 테이블을 생성하였다.
 
 ```sql
-SELECT
-    category_id,
-    COUNT(*) AS book_count
-FROM book
-WHERE deleted_at IS NULL
-GROUP BY category_id;
+UNIQUE (member_id, region_id)
 ```
 
-데이터를 중복 저장하지 않아 실제 책 데이터와 집계 값이 달라지는 문제를 방지할 수 있다.
+제약조건을 적용하여 한 회원이 같은 지역의 보상을 두 번 받을 수 없도록 하였다.
 
-### 5. 반납 예정 시간 저장
+---
 
-반납 시간 임박 알림을 구현하기 위해 `rental` 테이블에 `due_at`을 저장하도록 설계하였다.
+### 4. 소셜 계정 중복 가입 방지
 
-`returned_at`이 NULL이라면 아직 반납되지 않은 대여로 판단할 수 있다.
+소셜 로그인 제공자와 소셜 계정의 식별자를 함께 UNIQUE로 설정하였다.
+
+```sql
+UNIQUE (social_type, social_id)
+```
+
+예를 들어 같은 카카오 계정이 두 개의 회원 데이터로 생성되는 것을 방지할 수 있다.
+
+---
+
+### 5. Soft Delete
+
+`member`, `region`, `food_category`, `store`, `mission`에는 `deleted_at` 컬럼을 두었다.
+
+데이터를 실제로 삭제하는 대신 삭제 시점을 저장하여 기존 데이터와의 관계를 유지할 수 있도록 설계하였다.
 
 ---
 
 ## 8. 회고
 
-이번 실습을 통해 화면의 요구사항을 단순히 컬럼으로 옮기는 것이 아니라, 데이터 간 관계를 먼저 파악하는 것이 중요하다는 점을 알게 되었다.
+이번 미션을 통해 화면에 존재하는 데이터를 그대로 테이블로 만드는 것이 아니라, 요구사항에서 각 데이터 사이의 관계를 먼저 파악하는 것이 중요하다는 점을 알게 되었다.
 
-특히 N:M 관계를 그대로 표현하는 것이 아니라 매핑 테이블을 사용해야 한다는 점과, 회원 탈퇴처럼 데이터 삭제 이후에도 기존 데이터와의 관계가 필요한 경우 Soft Delete를 사용할 수 있다는 점을 이해하였다.
+특히 회원과 미션처럼 N:M 관계가 발생하는 경우 중간 테이블을 두어 관계를 해결하는 방법을 이해할 수 있었다.
 
-또한 카테고리별 책 개수처럼 기존 데이터를 통해 계산할 수 있는 값은 별도의 컬럼으로 저장하지 않고 조회 시 집계하여 데이터 중복을 줄이는 것이 좋다는 점을 배웠다.
+또한 지역 미션 10개 완료 시 1,000 Point를 지급하는 요구사항을 구현할 때 단순히 완료한 미션의 개수만 계산하는 것이 아니라, 이미 보상을 지급했는지를 별도로 관리해야 중복 지급을 방지할 수 있다는 점을 고려하여 `member_region_reward` 테이블을 추가하였다.

@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "rootDir": "./min/week1/mission 1/src",
+    "outDir": "./min/week1/mission 1/dist",
+    "strict": true
+  },
+  "include": ["min/week1/mission 1/src/**/*.ts"]
+}

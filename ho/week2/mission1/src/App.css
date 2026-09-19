@@ -1,0 +1,47 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 80px;
+}
+
+.main {
+  flex: 1;
+  padding: 40px 0 80px;
+}
+
+.page-title {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  margin-bottom: 24px;
+}
+
+.footer {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  height: 64px;
+  font-size: 13px;
+  color: var(--color-text-sub);
+}
+
+.footer-logo {
+  height: 10px;
+}
+
+.footer a {
+  text-decoration: underline;
+}

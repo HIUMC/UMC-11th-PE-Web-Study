@@ -155,6 +155,4 @@ CREATE TABLE member_region_reward (
 
 ![1주차 ERD](./1주차_ERD.png)
 
-## 5. 트러블슈팅 / 회고
 
-- (여기에 미션 진행 중 겪은 이슈-원인-해결-배운 점을 직접 정리)

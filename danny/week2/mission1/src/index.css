@@ -1,0 +1,38 @@
+:root {
+  --color-surface: #ffffff;
+  --color-page: #f6f7f9;
+  --color-ink: #17191e;
+  --color-ink-muted: #606774;
+  --color-ink-subtle: #969da8;
+  --color-border: #e3e6eb;
+  --color-brand: #2563eb;
+  --color-brand-hover: #1d4ed8;
+  --color-brand-pressed: #1748ad;
+  --color-brand-disabled: #d9e5ff;
+  --color-danger: #d92d20;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-page);
+  color: var(--color-ink);
+  font-family:
+    system-ui,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}

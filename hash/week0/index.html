@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>해시의 웹 개발 카드</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+
+  <body>
+    <main class="card">
+      <header class="card-header">
+        <p class="eyebrow">UMC 11TH · WEEK 0</p>
+
+        <h1>해시의 웹 개발 시작</h1>
+
+        <p id="message" class="introduction" aria-live="polite">
+          백엔드 경험을 바탕으로 프론트엔드도 차근차근 배우고 있습니다.
+        </p>
+      </header>
+
+      <section class="card-section" aria-labelledby="skills-title">
+        <h2 id="skills-title">배우고 싶은 기술</h2>
+
+        <ul class="skills">
+          <li class="skill">HTML</li>
+          <li class="skill">CSS</li>
+          <li class="skill">JavaScript</li>
+          <li class="skill">React</li>
+        </ul>
+      </section>
+
+      <section class="card-section" aria-labelledby="link-title">
+        <h2 id="link-title">나의 링크</h2>
+
+        <a
+          class="github-link"
+          href="https://github.com/ww123ok"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          GitHub 방문하기
+          <span aria-hidden="true">↗</span>
+        </a>
+      </section>
+
+      <button id="cheer-button" type="button">
+        응원 메시지 보기
+      </button>
+    </main>
+  </body>
+</html>

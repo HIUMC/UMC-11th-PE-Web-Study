@@ -1,0 +1,56 @@
+name: umc-sql-week2
+
+services:
+  db:
+    image: mysql:8.4.11
+    environment:
+      # 외부 포트를 열지 않는 과제 전용 임시 DB다. 실제 계정 비밀번호를 파일에 두지 않는다.
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    tmpfs:
+      # 컨테이너를 재생성할 때 항상 빈 데이터 디렉터리로 시작한다.
+      # Docker의 기존 named/anonymous volume에는 손대지 않는다.
+      - /var/lib/mysql
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - mysql --protocol=TCP -h 127.0.0.1 -uroot -N -e 'SELECT 1' >/dev/null 2>&1
+      interval: 2s
+      timeout: 5s
+      retries: 40
+      start_period: 30s
+
+  runner:
+    image: mysql:8.4.11
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./:/sql:ro
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        run_sql() {
+          file="$$1"
+          echo
+          echo "========== START: $$file =========="
+          if mysql \
+            --protocol=TCP \
+            --host=db \
+            --user=root \
+            --default-character-set=utf8mb4 \
+            --show-warnings \
+            --table < "/sql/$$file"; then
+            echo "========== END: $$file (OK) =========="
+          else
+            status="$$?"
+            echo "========== END: $$file (ERROR, exit $$status) ==========" >&2
+            exit "$$status"
+          fi
+        }
+
+        for file in 01_schema.sql 02_seed.sql 05_verify.sql 03_missions.sql 04_practice.sql; do
+          run_sql "$$file"
+        done
+
+        echo
+        echo "========== ALL SQL FILES COMPLETED =========="

@@ -1,0 +1,155 @@
+.movie-card {
+    /* article.movie-card */
+
+    /* 오토레이아웃 */
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+    gap: 4px;
+
+
+
+}
+
+.poster {
+    position: relative;
+
+    width: 241.6px;
+    height: 274px;
+
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.poster-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bookmark {
+    /* 스파이더맨: 브랜드 뉴 데이 즐겨찾기 */
+
+    box-sizing: border-box;
+
+    /* 오토레이아웃 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 7.5px 6px;
+
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    right: 9.8px;
+    top: 10px;
+
+    background: #17191E;
+    border: 1px solid #FFFFFF;
+    border-radius: 8px;
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    z-index: 1;
+
+}
+
+.bookmark img {
+    /* Bookmark border */
+
+    width: 24px;
+    height: 24px;
+
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+
+}
+
+.bookmark.active {
+    /* 오디세이 즐겨찾기 */
+
+    box-sizing: border-box;
+
+    /* 오토레이아웃 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 7.5px 6px;
+
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    right: 9.81px;
+    top: 10px;
+
+    background: #2563EB;
+    border: 1px solid #2563EB;
+    border-radius: 8px;
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    z-index: 1;
+
+}
+
+
+.movie-title {
+    /* 스파이더맨: 브랜드 뉴 데이 */
+
+    width: 241.6px;
+    height: 17px;
+
+    font-family: 'Pretendard';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 14px;
+    line-height: 17px;
+    /* 상자 높이와 동일 */
+    display: flex;
+    align-items: center;
+    padding: 5px 0px;
+
+    color: #17191E;
+
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+
+}
+
+.movie-meta {
+    /* 2026.07.29 */
+
+    width: 241.6px;
+    height: 14px;
+
+    font-family: 'Pretendard';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 14px;
+    display: flex;
+    align-items: center;
+    color: #969DA8;
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+
+}

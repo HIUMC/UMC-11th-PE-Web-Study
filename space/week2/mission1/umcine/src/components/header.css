@@ -1,0 +1,262 @@
+.topbar {
+    /* header.topbar */
+
+    /* 오토레이아웃 */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 24px 80px;
+
+
+    width: 100%;
+    height: auto;
+
+    background: #FFFFFF;
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 0;
+    align-self: stretch;
+    flex-grow: 0;
+    z-index: 0;
+
+    border-bottom: 1px solid #E3E6EB;
+
+}
+
+.brand-row {
+    /* div.brand-row */
+
+    /* 오토레이아웃 */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px;
+    gap: 42px;
+
+    width: 308px;
+    height: 32px;
+
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+
+
+}
+
+.brand {
+    /* div.brand */
+
+    /* 오토레이아웃 */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px;
+    gap: 10px;
+
+    width: 116px;
+    height: 32px;
+
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+
+}
+
+.brand-name {
+    /* UMCine */
+
+    width: 74px;
+    height: 24px;
+
+    font-family: 'Pretendard';
+    font-style: normal;
+    font-weight: 900;
+    font-size: 20px;
+    line-height: 24px;
+    /* 상자 높이와 동일 */
+    display: flex;
+    align-items: center;
+    letter-spacing: -0.7px;
+
+    color: #17191E;
+
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+
+}
+
+.mark {
+    /* span.mark */
+
+    box-sizing: border-box;
+
+    /* 오토레이아웃 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 0px;
+
+    width: 32px;
+    height: 32px;
+
+    border: 2px solid #17191E;
+    border-radius: 8px;
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+
+}
+
+.nav {
+    /* 주요 메뉴 */
+
+    /* 오토레이아웃 */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px;
+    gap: 30px;
+
+    width: 150px;
+    height: 17px;
+
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+
+}
+
+.nav-item {
+    /* 영화 */
+
+    width: auto;
+    height: 17px;
+
+    font-family: 'Pretendard';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 17px;
+    /* 상자 높이와 동일 */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    text-decoration-line: underline;
+
+    color: #17191E;
+
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+.nav-item.inactive {
+    color: #606774;
+    text-decoration-line: none;
+
+
+}
+
+.top-actions {
+    /* div.top-actions */
+
+    /* 오토레이아웃 */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0px;
+    gap: 10px;
+
+    width: 123px;
+    height: 42px;
+
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+
+}
+
+.search {
+    /* 영화 검색 */
+
+    box-sizing: border-box;
+
+    /* 오토레이아웃 */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 1px 6px;
+
+    width: 42px;
+    height: 42px;
+
+    background: #FFFFFF;
+    border: 1px solid #E3E6EB;
+    border-radius: 8px;
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+
+}
+
+.login {
+    /* button.btn */
+
+    box-sizing: border-box;
+
+    /* 오토레이아웃 */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0px 16px;
+
+    width: 71px;
+    height: 42px;
+
+    background: #2563EB;
+    border: 1px solid #FFFFFF;
+    border-radius: 8px;
+
+    /* 내부 오토레이아웃 */
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+
+    /* 로그인 */
+
+    font-family: 'Pretendard';
+    font-style: normal;
+    font-weight: 800;
+    font-size: 14px;
+    line-height: 17px;
+    /* 상자 높이와 동일 */
+    display: flex;
+    align-items: center;
+    text-align: center;
+
+    color: #FFFFFF;
+
+}

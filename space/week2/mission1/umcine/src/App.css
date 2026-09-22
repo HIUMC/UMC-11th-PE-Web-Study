@@ -1,0 +1,55 @@
+body
+{
+  margin: 0;
+  padding: 0;
+  background-color: #F6F7F9;
+}
+
+.container {
+  /* main.container */
+
+  /* 오토레이아웃 */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px 80px;
+  gap: 20px;
+
+  width: auto;
+  height: auto;
+
+
+  /* 내부 오토레이아웃 */
+  flex: none;
+  order: 1;
+  align-self: stretch;
+  flex-grow: 0;
+  z-index: 1;
+
+}
+
+.container-title {
+  /* 영화 목록 */
+
+  width: 134px;
+  height: 44px;
+
+  font-family: 'Pretendard';
+  font-style: normal;
+  font-weight: 700;
+  font-size: 38px;
+  line-height: 44px;
+  /* 상자 높이와 동일 또는 116% */
+  display: flex;
+  align-items: center;
+  letter-spacing: -1.71px;
+
+  color: #17191E;
+
+
+  /* 내부 오토레이아웃 */
+  flex: none;
+  order: 0;
+  flex-grow: 0;
+
+}

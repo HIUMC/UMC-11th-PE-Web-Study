@@ -66,3 +66,6 @@ node_modules/
 # Build outputs
 dist/
 **/dist/
+
+node_modules/
+dist/

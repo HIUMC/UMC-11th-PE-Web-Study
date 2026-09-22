@@ -58,14 +58,3 @@ Thumbs.db
 ### Logs / Cache ###
 *.log
 .cache/
-
-
-<<<<<<< HEAD
-# Build outputs
-dist/
-**/dist/
-
-node_modules/
-dist/
-=======
->>>>>>> 847ae0e33bf22fe3839cc8bbd1703de8de4f5046

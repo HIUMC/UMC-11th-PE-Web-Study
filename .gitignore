@@ -60,3 +60,7 @@ Thumbs.db
 .cache/
 
 
+# Build outputs
+dist/
+**/dist/
+

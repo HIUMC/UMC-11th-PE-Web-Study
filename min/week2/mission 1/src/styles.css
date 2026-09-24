@@ -207,6 +207,10 @@ h1 {
   font-weight: 500;
 }
 
+.pagination {
+  display: none;
+}
+
 @media (max-width: 900px) {
   .header {
     padding: 0 24px;

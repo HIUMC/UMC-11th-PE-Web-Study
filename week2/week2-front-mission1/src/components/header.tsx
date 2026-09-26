@@ -9,6 +9,7 @@ function Header() {
         <a className="active" href="#movies">영화</a>
         <a href="#bookmarks">내가 찜한 영화</a>
       </nav>
+      
       <div className="header-actions">
         <button className="icon-button" type="button" aria-label="영화 검색">
           <img src="/icons/search.svg" alt="" />

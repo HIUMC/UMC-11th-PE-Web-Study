@@ -2,7 +2,6 @@ import { useState } from "react";
 import MovieGrid from "../../components/movies/movie-grid";
 import Pagination from "../../components/movies/pagination";
 import { movies as initialMovies } from "../../data/movies";
-import "../../App.css";
 
 export function MovieListPage() {
   const [movieList, setMovieList] = useState(initialMovies);
@@ -18,8 +17,10 @@ export function MovieListPage() {
   }
 
   return (
-    <main className="movie-page">
-      <h1 className="page-title">영화 목록</h1>
+    <main className="mx-auto w-[1120px] pt-10 pb-16">
+      <h1 className="mb-6 text-[28px] leading-[1.3]">
+        영화 목록
+      </h1>
 
       <MovieGrid
         movies={movieList}

@@ -11,7 +11,7 @@ export default function MovieGrid({
   onToggleBookmark,
 }: MovieGridProps) {
   return (
-    <div className="movie-grid">
+    <div className="grid grid-cols-5 gap-x-4 gap-y-8">
       {movies.map((movie) => (
         <MovieCard
           key={movie.id}

@@ -17,7 +17,7 @@ export function MovieListPage() {
   }
 
   return (
-    <main className="mx-auto w-[1120px] pt-10 pb-16">
+    <main className="mx-auto w-full max-w-[1120px] px-4 pt-10 pb-16 xl:px-0">
       <h1 className="mb-6 text-[28px] leading-[1.3]">
         영화 목록
       </h1>

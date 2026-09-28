@@ -1,0 +1,176 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: #171717;
+}
+
+/* Header */
+
+.header {
+  height: 88px;
+  background: white;
+  border-bottom: 1px solid #eee;
+}
+
+.header-inner {
+  max-width: 1280px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.logo {
+  font-size: 20px;
+}
+
+.nav {
+  display: flex;
+  gap: 28px;
+}
+
+.nav a {
+  color: #222;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-button {
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+}
+
+.login-button {
+  height: 38px;
+  padding: 0 18px;
+
+  border: 0;
+  border-radius: 6px;
+
+  color: white;
+  background: #2563eb;
+}
+
+/* 영화 목록 */
+
+.main {
+  min-height: calc(100vh - 148px);
+
+  padding: 30px 24px 100px;
+
+  background: #f5f6f8;
+}
+
+.main > h1,
+.movie-grid {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.main h1 {
+  margin-top: 0;
+  margin-bottom: 24px;
+
+  font-size: 32px;
+}
+
+/* 5열 */
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+
+  gap: 24px 20px;
+}
+
+/* 카드 */
+
+.poster-wrapper {
+  position: relative;
+}
+
+.movie-poster {
+  display: block;
+
+  width: 100%;
+  aspect-ratio: 0.88;
+
+  object-fit: cover;
+
+  border-radius: 8px;
+}
+
+.bookmark-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  width: 32px;
+  height: 32px;
+
+  padding: 0;
+  border: 0;
+
+  background: transparent;
+  cursor: pointer;
+}
+
+.bookmark-button img {
+  width: 100%;
+  height: 100%;
+}
+
+.movie-card h3 {
+  margin: 10px 0 4px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.movie-card p {
+  margin: 0;
+
+  color: #888;
+  font-size: 11px;
+}
+
+/* footer */
+
+.footer {
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  padding: 0 40px;
+
+  color: #999;
+  font-size: 10px;
+
+  background: white;
+}

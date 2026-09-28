@@ -1,6 +1,13 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { cn } from "../../utils/cn";
 
 export default function Header() {
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
+  const isMovieRoute = pathname === "/" || pathname.startsWith("/movies/");
+  const isSearchRoute = pathname === "/search";
+
   return (
     <header className="h-[72px] border-b border-[#eceef2] bg-white">
       <div className="mx-auto flex h-full max-w-[1120px] items-center">
@@ -21,13 +28,22 @@ export default function Header() {
           aria-label="주요 메뉴"
         >
           <Link
-            className="border-b-2 border-[#171719] py-[25px] font-bold text-[#171719]"
+            className={cn(
+              "border-b-2 border-transparent py-[25px]",
+              isMovieRoute && "border-[#171719] font-bold text-[#171719]",
+            )}
             to="/"
           >
             영화
           </Link>
 
-          <Link className="py-[25px]" to="/search">
+          <Link
+            className={cn(
+              "border-b-2 border-transparent py-[25px]",
+              isSearchRoute && "border-[#171719] font-bold text-[#171719]",
+            )}
+            to="/search"
+          >
             검색
           </Link>
 

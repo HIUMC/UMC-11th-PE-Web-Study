@@ -1,0 +1,368 @@
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #F6F7F9;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: #F6F7F9;
+  color: #1e293b;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 헤더 */
+.header {
+  background-color: #FFFFFF; 
+  border-bottom: 1px solid #E3E6EB; 
+  padding: 0 80px; 
+  height: 91px;
+  display: flex;
+  align-items: center;
+}
+
+.header-container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; 
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center; 
+  gap: 10px;
+}
+
+.logo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+
+.logo-icon {
+  width: 32px;
+  height: 32px;
+  padding: 2px; 
+  border: 2px solid #17191E; 
+  border-radius: 8px;
+}
+
+.logo-text {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 900;
+  font-size: 20px;
+  color: #17191E; 
+  letter-spacing: -0.7px;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-item {
+  display: inline-block; 
+  text-decoration: none; 
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 700; 
+  font-size: 14px; 
+  color: #606774; 
+  transition: all 0.15s ease;
+}
+
+.nav-item:hover,
+.nav-item.active {
+  color: #17191E; 
+  text-decoration: underline; 
+}
+
+.icon-button {
+  background-color: #FFFFFF; 
+  border: 1px solid #E3E6EB; 
+  border-radius: 8px; 
+  width: 42px; 
+  height: 42px; 
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.icon-button:hover {
+  background-color: #F6F7F9;
+}
+
+.search-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.login-button {
+  background-color: #2563EB; 
+  color: #FFFFFF; 
+  border: none;
+  border-radius: 8px; 
+  width: 71px; 
+  height: 42px; 
+  font-family: 'Pretendard', sans-serif;
+  font-size: 14px; 
+  font-weight: 800; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-button:hover {
+  background-color: #1d4ed8;
+}
+
+/*  메인 컨텐츠 */
+.main-content {
+  max-width: 1440px; 
+  margin: 0 auto;
+  padding: 24px 80px; 
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; 
+}
+
+.section-title {
+  font-family: 'Pretendard', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-align: left;
+  margin: 0;
+}
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px; 
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .movie-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 600px) {
+  .movie-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 300px) {
+  .movie-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+/*  영화 카드  */
+.movie-card {
+  display: flex;
+  flex-direction: column; 
+  gap: 4px; 
+  width: 100%;
+}
+
+.poster-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 241.6 / 274; 
+  border-radius: 8px; 
+  overflow: hidden;
+  background-color: #F6F7F9; 
+}
+
+.poster-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.poster-image:hover {
+  transform: scale(1.03);
+}
+
+.bookmark-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 34px;
+  height: 34px;
+  background-color: #17191E;
+  border: 1px solid #FFFFFF;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.bookmark-button:hover {
+  background-color: #0f172a;
+}
+
+.bookmark-button.active {
+  background-color: #2563EB;
+  border-color: #2563EB;
+}
+
+.bookmark-icon {
+  width: 24px;
+  height: 24px;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+
+/* 영화 정보 */
+.movie-info {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: left;
+}
+
+.movie-title {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 800; 
+  font-size: 14px; 
+  color: #17191E; 
+  margin: 0;
+  padding-top: 5px; 
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.movie-date {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: #969DA8;
+  margin: 0;
+  line-height: 14px; 
+}
+
+/* 페이지네이션 */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 6px;
+}
+
+.page-arrow, .page-btn {
+  background: none;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #475569;
+  transition: all 0.2s;
+}
+
+.page-arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.page-arrow img {
+  width: 16px;
+  height: 16px;
+}
+
+.page-btn:hover:not(.active) {
+  background-color: #F6F7F9;
+}
+
+.page-btn.active {
+  background-color: #3b82f6;
+  color: #F6F7F9;
+  border-color: #3b82f6;
+}
+
+/* 푸터 영역 */
+.footer {
+  background-color: #FFFFFF; 
+  border-top: 1px solid #E3E6EB; 
+  padding: 16px 80px; 
+  min-height: 57px; 
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+}
+
+.footer-content {
+  width: 100%;
+  max-width: 1440px; 
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px; 
+  color: #606774; 
+  font-family: 'Pretendard', sans-serif;
+  font-size: 12px; 
+  font-weight: 400; 
+  line-height: 100%; 
+}
+
+.tmdb-logo {
+  width: 24px; 
+  height: 24px; 
+  display: block;
+}
+
+.footer-content a,
+.footer-content span.tmdb-link {
+  color: inherit;
+  text-decoration: underline; 
+  text-decoration-style: solid; 
+  text-decoration-skip-ink: auto; 
+}

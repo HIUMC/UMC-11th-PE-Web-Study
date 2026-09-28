@@ -1,0 +1,3 @@
+export default function Header() {
+  return <header className="site-header"><div className="header-inner"><a className="brand" href="#" aria-label="UMCine 홈">UMC<span>ine</span></a><nav className="main-nav" aria-label="주요 메뉴"><a className="active" href="#movies">영화</a><a href="#upcoming">상영 예정</a><a href="#bookmarks">북마크</a></nav><div className="header-actions"><button className="icon-button" type="button" aria-label="검색"><img src="/icons/search.svg" alt="" /></button><button className="icon-button" type="button" aria-label="마이페이지"><img src="/icons/person.svg" alt="" /></button></div></div></header>;
+}

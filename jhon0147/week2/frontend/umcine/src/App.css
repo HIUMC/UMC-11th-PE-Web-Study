@@ -1,0 +1,378 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  height: 88px;
+  background: #ffffff;
+  border-bottom: 1px solid #edf0f4;
+}
+
+.header-inner {
+  width: min(1280px, calc(100% - 48px));
+  height: 100%;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #111827;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-decoration: none;
+}
+
+.brand-icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #111827;
+  border-radius: 8px;
+}
+
+.brand-icon img {
+  width: 22px;
+  height: 22px;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-left: 44px;
+}
+
+.navigation-link {
+  position: relative;
+  padding: 34px 0 31px;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.navigation-link:hover,
+.navigation-link.is-active {
+  color: #111827;
+}
+
+.navigation-link.is-active::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 23px;
+  left: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: #111827;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.search-button,
+.login-button,
+.bookmark-button,
+.pagination button {
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.search-button {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #f5f7fa;
+}
+
+.search-button:hover {
+  background: #e9edf3;
+}
+
+.search-button img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.58;
+}
+
+.login-button {
+  height: 40px;
+  padding: 0 21px;
+  border-radius: 7px;
+  color: #ffffff;
+  background: #3f6ff2;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.login-button:hover {
+  background: #315fdd;
+}
+
+.page-shell {
+  flex: 1;
+  padding: 31px max(24px, calc((100% - 1280px) / 2)) 72px;
+  background: #f6f8fb;
+}
+
+.movie-list {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.movie-list h1 {
+  margin: 0 0 22px;
+  color: #111827;
+  font-size: 30px;
+  line-height: 1.25;
+  letter-spacing: -0.04em;
+}
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  column-gap: 16px;
+  row-gap: 27px;
+}
+
+.movie-card {
+  min-width: 0;
+}
+
+.poster-wrap {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 8 / 9;
+  border-radius: 9px;
+  background: #e5e7eb;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.1);
+}
+
+.movie-poster {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform 180ms ease;
+}
+
+.movie-card:hover .movie-poster {
+  transform: scale(1.018);
+}
+
+.bookmark-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  border-radius: 9px;
+  background: rgba(17, 24, 39, 0.82);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(4px);
+}
+
+.bookmark-button:hover {
+  background: rgba(17, 24, 39, 0.96);
+}
+
+.bookmark-button.is-bookmarked {
+  border-color: #4978f4;
+  background: #4978f4;
+}
+
+.bookmark-button img {
+  width: 24px;
+  height: 24px;
+  filter: invert(1);
+}
+
+.movie-card h2 {
+  overflow: hidden;
+  margin: 11px 0 4px;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 750;
+  line-height: 1.35;
+  letter-spacing: -0.025em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.movie-card p {
+  margin: 0;
+  color: #9ca3af;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 54px;
+}
+
+.pagination button {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  color: #6b7280;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: #e8edf7;
+}
+
+.pagination .pagination-page.is-active,
+.pagination .pagination-page.is-active:hover {
+  color: #ffffff;
+  background: #3f6ff2;
+}
+
+.pagination-arrow img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.32;
+}
+
+.footer {
+  background: #ffffff;
+  border-top: 1px solid #edf0f4;
+}
+
+.footer-inner {
+  width: min(1280px, calc(100% - 48px));
+  min-height: 92px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  color: #9ca3af;
+  font-size: 11px;
+}
+
+.footer-inner p {
+  margin: 0;
+}
+
+.tmdb-logo {
+  width: 76px;
+  height: auto;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(63, 111, 242, 0.4);
+  outline-offset: 3px;
+}
+
+@media (max-width: 1100px) {
+  .movie-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 28px 18px;
+  }
+}
+
+@media (max-width: 720px) {
+  .header {
+    height: auto;
+  }
+
+  .header-inner {
+    min-height: 72px;
+    flex-wrap: wrap;
+    padding: 14px 0;
+    row-gap: 12px;
+  }
+
+  .navigation {
+    order: 3;
+    width: 100%;
+    gap: 24px;
+    margin-left: 0;
+  }
+
+  .navigation-link {
+    padding: 7px 0 10px;
+  }
+
+  .navigation-link.is-active::after {
+    bottom: 4px;
+  }
+
+  .movie-list h1 {
+    font-size: 26px;
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 14px;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    gap: 8px;
+    padding: 22px 0;
+    text-align: center;
+  }
+}
+
+@media (max-width: 420px) {
+  .header-inner,
+  .footer-inner {
+    width: min(100% - 32px, 1280px);
+  }
+
+  .page-shell {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  .navigation {
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .search-button {
+    display: none;
+  }
+
+  .movie-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .poster-wrap {
+    aspect-ratio: 4 / 5;
+  }
+}

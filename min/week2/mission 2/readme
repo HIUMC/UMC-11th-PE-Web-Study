@@ -1,0 +1,61 @@
+# 자기 ERD 확장 조회
+
+## 요구사항
+
+특정 회원이 현재 진행 중인 미션을 최근 참여한 순서대로 최대 5개 조회합니다.
+
+- 결과: 회원 닉네임, 미션 제목, 가게 이름, 지역 이름
+- 테이블: `member`, `member_mission`, `mission`, `store`, `region`
+- 관계: `member → member_mission → mission → store → region`
+- 조건: 특정 회원의 진행 중인 미션만 조회
+- 정렬·범위: 미션 참여 시점 최신순, 최대 5개
+
+## 화면 조회 목적
+
+마이페이지에서 사용자가 현재 진행 중인 미션을 확인할 때 사용할 수 있는 조회 쿼리입니다. 사용자는 어떤 미션을 수행 중인지뿐 아니라, 해당 미션이 어느 가게와 어느 지역에 속한 미션인지 함께 확인할 수 있어야 합니다.
+
+## 조회 SQL
+
+```sql
+SELECT
+    mb.nickname,
+    m.title AS mission_title,
+    s.name AS store_name,
+    r.name AS region_name
+FROM member_mission mm
+JOIN member mb
+    ON mm.member_id = mb.id
+JOIN mission m
+    ON mm.mission_id = m.id
+JOIN store s
+    ON m.store_id = s.id
+JOIN region r
+    ON s.region_id = r.id
+WHERE mb.nickname = '민서'
+  AND mm.status = 'IN_PROGRESS'
+  AND mm.deleted_at IS NULL
+  AND mb.deleted_at IS NULL
+  AND m.deleted_at IS NULL
+  AND s.deleted_at IS NULL
+  AND r.deleted_at IS NULL
+ORDER BY mm.created_at DESC
+LIMIT 5;
+```
+
+## JOIN 경로
+
+`member → member_mission → mission → store → region`
+
+## 쿼리 설명
+
+기준 테이블은 회원별 미션 수행 내역을 저장하는 `member_mission`입니다. 이 테이블에는 어떤 회원이 어떤 미션에 참여했는지와 현재 미션 수행 상태가 저장되어 있으므로, 진행 중인 미션을 찾기 위한 중심 테이블로 사용했습니다.
+
+회원 닉네임을 조회하기 위해 `member`, 미션 제목을 조회하기 위해 `mission`을 JOIN했습니다. 또한 미션이 등록된 가게 이름과 지역 이름을 함께 보여주기 위해 `mission → store → region` 순서로 JOIN했습니다.
+
+`WHERE` 조건에서는 닉네임이 `민서`인 회원의 데이터 중 `member_mission.status`가 `IN_PROGRESS`인 미션만 조회했습니다. Soft Delete된 데이터가 결과에 포함되지 않도록 각 테이블의 `deleted_at IS NULL` 조건도 함께 적용했습니다.
+
+정렬 기준은 `member_mission.created_at`입니다. 미션에 참여한 시점을 기준으로 내림차순 정렬하여 가장 최근에 시작한 미션이 먼저 보이도록 했고, `LIMIT 5`를 사용해 최대 5개까지만 조회했습니다.
+
+## 실행 결과 검증
+
+실행 결과에는 `민서` 회원의 진행 중인 미션만 조회됩니다. 각 행에는 회원 닉네임, 미션 제목, 가게 이름, 지역 이름이 포함되며, 최근 참여한 미션부터 정렬되므로 요구사항과 일치합니다.

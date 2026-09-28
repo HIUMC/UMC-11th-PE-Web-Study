@@ -1,0 +1,6 @@
+$kind: http-request
+name: http://localhost:8080/books/category/1
+description: ""
+url: http://localhost:8080/books/category/1
+method: GET
+order: 1790582425137

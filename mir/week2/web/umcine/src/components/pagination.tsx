@@ -1,0 +1,47 @@
+interface PaginationProps {
+  currentPage: number;
+  onPageChange: (page: number) => void;
+}
+
+export default function Pagination({
+  currentPage,
+  onPageChange,
+}: PaginationProps) {
+  const pages = [1, 2, 3, 4, 5];
+
+  return (
+    <nav className="pagination" aria-label="페이지 이동">
+      <button
+        type="button"
+        className="page-arrow"
+        disabled={currentPage === 1}
+        onClick={() => onPageChange(currentPage - 1)}
+      >
+        <img src="/icons/chevron-left.svg" alt="이전" />
+      </button>
+
+      <div className="page-numbers">
+        {pages.map((page) => (
+          <button
+            key={page}
+            type="button"
+            className={`page-btn ${currentPage === page ? "active" : ""}`}
+            onClick={() => onPageChange(page)}
+            aria-current={currentPage === page ? "page" : undefined}
+          >
+            {page}
+          </button>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        className="page-arrow"
+        disabled={currentPage === 5}
+        onClick={() => onPageChange(currentPage + 1)}
+      >
+        <img src="/icons/chevron-right.svg" alt="다음" />
+      </button>
+    </nav>
+  );
+}

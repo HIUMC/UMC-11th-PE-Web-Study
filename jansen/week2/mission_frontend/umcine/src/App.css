@@ -1,0 +1,171 @@
+:root {
+  --bg: #0d0d10;
+  --surface: #17171c;
+  --text: #f5f5f7;
+  --text-muted: #9a9aa2;
+  --accent: #f5c518;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Pretendard", "Apple SD Gothic Neo", sans-serif;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding: 20px 48px;
+  background: var(--surface);
+  border-bottom: 1px solid #232329;
+}
+
+.app-logo {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.app-nav {
+  display: flex;
+  gap: 24px;
+}
+
+.app-nav-item {
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.app-nav-item.active {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.app-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 48px 80px;
+}
+
+.page-title {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.movie-grid-empty {
+  color: var(--text-muted);
+}
+
+.movie-card {
+  background: var(--surface);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.movie-card-poster {
+  position: relative;
+  aspect-ratio: 2 / 3;
+  background: #232329;
+}
+
+.movie-card-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bookmark-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.55);
+  color: var(--text);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bookmark-button.is-active {
+  color: var(--accent);
+}
+
+.movie-card-body {
+  padding: 12px 14px 16px;
+}
+
+.movie-card-title {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.movie-card-meta {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 40px;
+}
+
+.pagination-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid #2a2a31;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.pagination-button.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #14140f;
+  font-weight: 700;
+}
+
+/* 선택 미션: 화면 너비에 따라 3열 → 2열 → 1열 */
+@media (max-width: 960px) {
+  .movie-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .app-main {
+    padding: 24px 20px 60px;
+  }
+
+  .movie-grid {
+    grid-template-columns: 1fr;
+  }
+}

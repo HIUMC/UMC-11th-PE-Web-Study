@@ -1,5 +1,0 @@
-.poster-wrap .bookmark-button{position:absolute;top:6px;right:6px;width:24px;height:24px;border:1px solid #fff;border-radius:4px;background:#17191e;padding:3px;display:flex;align-items:center;justify-content:center;z-index:2}.poster-wrap .bookmark-button img{width:16px;height:16px;filter:invert(1)}.poster-wrap .bookmark-button[aria-label="북마크 해제"]{background:#2563eb;border-color:#2563eb}.poster-wrap .bookmark-button[aria-label="북마크 해제"] img{filter:brightness(0) invert(1)}
-.movie-list{max-width:1330px}.list-grid{grid-template-columns:repeat(5,241.6px);gap:25px 16px}.poster-wrap{width:241.6px;height:274px}
-@media(max-width:1330px){.movie-list{padding-left:24px;padding-right:24px}.list-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.poster-wrap{width:100%;height:auto;aspect-ratio:241.6/274}}
-@media(max-width:700px){.list-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.poster-wrap{width:100%;height:auto;aspect-ratio:241.6/274}}
-.poster-wrap>img{object-fit:cover!important;background:transparent!important}

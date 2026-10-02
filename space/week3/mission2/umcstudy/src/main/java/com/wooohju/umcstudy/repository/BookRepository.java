@@ -7,31 +7,62 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Map;
 
-@Repository // 스프링 컨테이너에 "나 창고지기 부품이야!"라고 등록
+@Repository
 @RequiredArgsConstructor
 public class BookRepository {
 
-    // 2단계에서 준비된 스프링의 DB 통신 도구(JdbcTemplate) 주입
     private final JdbcTemplate jdbcTemplate;
 
     public List<Map<String, Object>> findAll() {
         String sql = "SELECT * FROM book";
-
-        // 쿼리를 실행하고 결과를 List<Map> 형태의 날것 데이터로 긁어옵니다.
-        // Map의 Key는 '컬럼명(title)', Value는 '실제 데이터(달빛 도서관)'가 됩니다.
         return jdbcTemplate.queryForList(sql);
     }
 
-    public void save(Map<String, Object> body){
-        // book_id는 AUTO_INCREMENT이므로 생략, is_available은 기본 true로 삽입
+    public void save(Map<String, Object> body) {
         String sql = "INSERT INTO book (category_id, title, description, is_available) VALUES (?, ?, ?, true)";
 
-        // SQL 뒤에 파라미터를 차례대로 넘겨주면 ? 자리에 순서대로 안전하게 바인딩됩니다.
         jdbcTemplate.update(
                 sql,
                 body.get("categoryId"),
                 body.get("title"),
                 body.get("description")
         );
+    }
+
+    public boolean existsById(Long bookId) {
+        String sql = "SELECT COUNT(*) FROM book WHERE book_id = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, bookId);
+        return count != null && count > 0;
+    }
+
+    public boolean isAvailable(Long bookId) {
+        String sql = "SELECT COUNT(*) FROM book WHERE book_id = ? AND is_available = true";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, bookId);
+        return count != null && count > 0;
+    }
+
+    public void saveRental(Long userId, Long bookId) {
+        String sql = """
+                INSERT INTO rental (user_id, book_id, rented_at, due_at)
+                VALUES (?, ?, NOW(), DATE_ADD(NOW(), INTERVAL 14 DAY))
+                """;
+
+        jdbcTemplate.update(sql, userId, bookId);
+    }
+
+    public int returnActiveRental(Long bookId) {
+        String sql = """
+                UPDATE rental
+                SET returned_at = NOW()
+                WHERE book_id = ?
+                  AND returned_at IS NULL
+                """;
+
+        return jdbcTemplate.update(sql, bookId);
+    }
+
+    public void updateAvailability(Long bookId, boolean isAvailable) {
+        String sql = "UPDATE book SET is_available = ? WHERE book_id = ?";
+        jdbcTemplate.update(sql, isAvailable, bookId);
     }
 }

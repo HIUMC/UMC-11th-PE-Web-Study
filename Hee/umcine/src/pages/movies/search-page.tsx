@@ -1,13 +1,18 @@
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState, type SubmitEvent } from "react";
 import { movies } from "../../data/movie";
+import { useBookmarkStore } from "../../stores/bookmark-store";
 
 const searchIcon = "/icons/movie-icons/movie-icons/search.svg";
+const bookmarkIcon = "/icons/movie-icons/movie-icons/bookmark.svg";
+const bookmarkOutlineIcon = "/icons/movie-icons/movie-icons/bookmark-outline.svg";
 
 export function SearchPage() {
   const { query } = useSearch({ from: "/search" });
   const navigate = useNavigate({ from: "/search" });
   const [searchText, setSearchText] = useState(query ?? "");
+  const bookmarkedMovieIds = useBookmarkStore((state) => state.bookmarkedMovieIds);
+  const toggleBookmark = useBookmarkStore((state) => state.toggleBookmark);
 
   const normalizedQuery = query?.trim().toLowerCase() ?? "";
   const searchResults = normalizedQuery
@@ -133,6 +138,26 @@ export function SearchPage() {
                     {movie.originalTitle} · {movie.releaseDate}
                   </p>
                   <p className="mt-3 line-clamp-2 text-xs leading-5 text-[#68707C]">{movie.overview}</p>
+                  <button
+                    type="button"
+                    onClick={() => toggleBookmark(movie.id)}
+                    aria-label={`${movie.title} 북마크 ${
+                      bookmarkedMovieIds.includes(movie.id) ? "해제" : "추가"
+                    }`}
+                    aria-pressed={bookmarkedMovieIds.includes(movie.id)}
+                    className="mt-3 flex w-fit items-center gap-1.5 rounded-md border border-[#D8DEE8] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#353B45]"
+                  >
+                    <img
+                      src={
+                        bookmarkedMovieIds.includes(movie.id)
+                          ? bookmarkIcon
+                          : bookmarkOutlineIcon
+                      }
+                      alt=""
+                      className="h-4 w-4"
+                    />
+                    {bookmarkedMovieIds.includes(movie.id) ? "북마크 해제" : "북마크 추가"}
+                  </button>
                   <Link
                     to="/movies/$movieId"
                     params={{ movieId: String(movie.id) }}

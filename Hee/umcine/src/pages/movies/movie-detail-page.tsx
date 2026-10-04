@@ -1,6 +1,7 @@
 import { Link, useParams } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { movies } from "../../data/movie";
+import { useBookmarkStore } from "../../stores/bookmark-store";
 import { cn } from "../../utils/cn";
 
 const bookmarkIcon = "/icons/movie-icons/movie-icons/bookmark-outline.svg";
@@ -10,7 +11,10 @@ const starOutlineIcon = "/icons/movie-icons/movie-icons/star-outline.svg";
 export function MovieDetailPage() {
   const { movieId } = useParams({ from: "/movies/$movieId" });
   const movie = movies.find((item) => item.id === Number(movieId));
-  const [isBookmarked, setIsBookmarked] = useState(movie?.isBookmarked ?? false);
+  const isBookmarked = useBookmarkStore((state) =>
+    movie ? state.bookmarkedMovieIds.includes(movie.id) : false,
+  );
+  const toggleBookmark = useBookmarkStore((state) => state.toggleBookmark);
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   const [isSaved, setIsSaved] = useState(false);
@@ -85,7 +89,7 @@ export function MovieDetailPage() {
           <p className="mt-4 max-w-2xl text-sm leading-7 text-[#68707C]">{movie.overview}</p>
           <button
             type="button"
-            onClick={() => setIsBookmarked((current) => !current)}
+            onClick={() => toggleBookmark(movie.id)}
             aria-pressed={isBookmarked}
             className={cn(
               "mt-5 inline-flex h-10 items-center gap-2 rounded-lg border px-4 text-sm font-semibold transition",

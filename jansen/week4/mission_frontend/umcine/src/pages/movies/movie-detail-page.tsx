@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { Link, useParams } from "@tanstack/react-router";
 import { movies } from "../../data/movies";
+import { useBookmarkStore } from "../../stores/bookmark-store";
 import { cn } from "../../utils/cn";
 import { BookmarkIcon, ChevronLeftIcon, StarIcon } from "../../components/icons";
-import { useBookmarkStore } from "../../stores/bookmark-store";
 
 export function MovieDetailPage() {
   const { movieId } = useParams({ from: "/movies/$movieId" });
   const movie = movies.find((item) => item.id === Number(movieId));
   const [rating, setRating] = useState(0);
+
   const isBookmarked = useBookmarkStore((state) =>
     state.bookmarkedMovieIds.includes(Number(movieId)),
   );
@@ -64,9 +65,7 @@ export function MovieDetailPage() {
             onClick={() => toggleBookmark(movie.id)}
             className={cn(
               "mt-6 flex h-11 cursor-pointer items-center gap-2 rounded-lg px-4 text-sm font-semibold",
-              isBookmarked
-                ? "bg-ink text-white"
-                : "bg-brand text-white",
+              isBookmarked ? "bg-ink text-white" : "bg-brand text-white",
             )}
           >
             <BookmarkIcon className="size-4" filled={isBookmarked} />

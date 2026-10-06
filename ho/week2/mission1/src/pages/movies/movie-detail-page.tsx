@@ -1,12 +1,12 @@
 import { Link, useParams } from "@tanstack/react-router";
 import { useState } from "react";
+import { BookmarkButton } from "../../components/bookmark-button";
 import { movies } from "../../data/movies";
 import { cn } from "../../utils/cn";
 
 export function MovieDetailPage() {
   const { movieId } = useParams({ from: "/movies/$movieId" });
   const movie = movies.find((item) => item.id === Number(movieId));
-  const [isBookmarked, setIsBookmarked] = useState(movie?.isBookmarked ?? false);
   const [rating, setRating] = useState(0);
 
   if (!movie) {
@@ -60,21 +60,7 @@ export function MovieDetailPage() {
           <p className="mt-4 max-w-2xl text-[15px] leading-7 text-slate-600">
             {movie.overview}
           </p>
-          <button
-            type="button"
-            onClick={() => setIsBookmarked((value) => !value)}
-            className={cn(
-              "mt-6 inline-flex h-11 items-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-bold text-white transition-colors hover:bg-blue-700",
-              isBookmarked && "bg-slate-900 hover:bg-slate-700",
-            )}
-          >
-            <img
-              src={isBookmarked ? "/icons/bookmark.svg" : "/icons/bookmark-outline.svg"}
-              alt=""
-              className="size-5 brightness-0 invert"
-            />
-            {isBookmarked ? "즐겨찾기 해제" : "즐겨찾기"}
-          </button>
+          <BookmarkButton movieId={movie.id} variant="detail" />
         </div>
 
         <aside className="border-l border-slate-200 pl-8">

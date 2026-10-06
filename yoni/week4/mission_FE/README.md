@@ -18,7 +18,3 @@ Web Storage 및 Zustand 상태 관리
 - 컴포넌트 상태와 전역 상태의 차이
 - Zustand store와 `persist` 사용 방법
 - Web Storage를 활용한 상태 유지 방법
-
----
-
-## BE

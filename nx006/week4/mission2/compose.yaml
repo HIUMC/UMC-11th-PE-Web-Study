@@ -1,0 +1,55 @@
+name: umc-week3-mission2
+
+services:
+  db:
+    image: mysql:8.4.11
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
+      - ./docker/mysql/02_seed.sql:/docker-entrypoint-initdb.d/02_seed.sql:ro
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          "mysql --protocol=TCP -h 127.0.0.1 -uroot -N -e 'SELECT COUNT(*) FROM umc_books_week2.book' >/dev/null 2>&1",
+        ]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+      start_period: 30s
+    restart: unless-stopped
+
+  app:
+    build: .
+    environment:
+      PORT: '3000'
+      DB_HOST: db
+      DB_PORT: '3306'
+      DB_USER: root
+      DB_PASSWORD: ''
+      DB_NAME: umc_books_week2
+      DB_LOG_QUERIES: '${DB_LOG_QUERIES:-false}'
+    ports:
+      - '127.0.0.1:3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/books').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 15s
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

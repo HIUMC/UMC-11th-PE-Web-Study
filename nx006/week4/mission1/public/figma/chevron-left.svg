@@ -1,0 +1,20 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Keyboard arrow left" clip-path="url(#clip0_0_34)">
+<g id="Vector">
+</g>
+<path id="Vector_2" d="M15.41 16.59L10.83 12L15.41 7.41L14 6L8 12L14 18L15.41 16.59Z" fill="#D9E5FF"/>
+<g id="Keyboard arrow right" clip-path="url(#clip1_0_34)">
+<g id="Vector_3">
+</g>
+<path id="Vector_4" d="M4.59 49.59L9.17 45L4.59 40.41L6 39L12 45L6 51L4.59 49.59Z" fill="#D9E5FF"/>
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_34">
+<rect width="24" height="24" fill="white"/>
+</clipPath>
+<clipPath id="clip1_0_34">
+<rect width="24" height="24" fill="white" transform="translate(-4 33)"/>
+</clipPath>
+</defs>
+</svg>

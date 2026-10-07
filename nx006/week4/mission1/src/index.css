@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: Pretendard;
+  src: url('/fonts/pretendard-variable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root { font-family: Pretendard, -apple-system, sans-serif; color: #17191e; background: #f6f7f9; font-synthesis: none; }
+body { min-width: 320px; }
+#root { min-height: 100vh; display: flex; flex-direction: column; }
+button { cursor: pointer; }
+button:disabled { cursor: default; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid #2563eb; outline-offset: 4px; }
+input::placeholder, textarea::placeholder { color: #969da8; opacity: 1; }

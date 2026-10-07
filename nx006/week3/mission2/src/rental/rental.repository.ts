@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool, ResultSetHeader } from 'mysql2/promise';
-import { DATABASE_CONNECTION } from './database.provider.js';
+import { DATABASE_CONNECTION } from '../database/database.provider.js';
 
 @Injectable()
 export class RentalRepository {

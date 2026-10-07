@@ -1,6 +1,7 @@
 import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
 import { RentalService } from './rental.service.js';
-import { positiveId } from './input.js';
+import { parseCreateRentalInput } from './rental.input.js';
+import { positiveId } from '../common/input.js';
 
 @Controller('rentals')
 export class RentalController {
@@ -8,7 +9,8 @@ export class RentalController {
 
   @Post()
   create(@Body() body: Record<string, unknown>) {
-    return this.rentals.create(positiveId(body?.userId, 'userId'), positiveId(body?.bookId, 'bookId'));
+    const { userId, bookId } = parseCreateRentalInput(body);
+    return this.rentals.create(userId, bookId);
   }
 
   @Patch(':rentalId/return')

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/rentals")
@@ -21,9 +22,10 @@ public class RentalController {
     }
 
     @PostMapping
+    @SuppressWarnings("null")
     public ResponseEntity<RentalResponse> createRental(@RequestBody RentalRequest request) {
         RentalResponse response = rentalService.createRental(request);
-        return ResponseEntity.created(URI.create("/rentals/" + response.rentalId())).body(response);
+        return ResponseEntity.created(URI.create("/rentals/" + Objects.requireNonNull(response.rentalId()))).body(response);
     }
 }
 

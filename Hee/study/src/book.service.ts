@@ -1,25 +1,55 @@
-// src/book.service.ts
-import { Injectable } from '@nestjs/common';
-import { BookRepository } from './book.repository.js';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+
+import { Book } from './book.entity.js';
+import { Category } from './category.entity.js';
+import { BookResponseDto } from './book-response.dto.js';
+import { CreateBookDto } from './create-book.dto.js';
 
 @Injectable()
 export class BookService {
-  // 창고지기(BookRepository)를 주입받습니다.
-  constructor(private readonly bookRepository: BookRepository) {}
+  constructor(
+    @InjectRepository(Book)
+    private readonly bookRepository: Repository<Book>,
 
-  // 전체 도서 조회
-  async getAllBooks(): Promise<any> {
-    return await this.bookRepository.findAll();
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
+  ) {}
+
+  // 실습 1: 전체 도서 조회
+  async getAllBooks(): Promise<BookResponseDto[]> {
+    const books = await this.bookRepository.find({
+      relations: {
+        category: true,
+      },
+      order: {
+        bookId: 'DESC',
+      },
+    });
+
+    return books.map((book) => BookResponseDto.from(book));
   }
 
-  // 도서 등록
-  async createBook(body: Record<string, any>): Promise<string> {
-    await this.bookRepository.create(body);
-    return '도서 등록이 완료되었습니다!';
-  }
+  // 실습 2: 도서 등록
+  async createBook(dto: CreateBookDto): Promise<BookResponseDto> {
+    const category = await this.categoryRepository.findOneBy({
+      categoryId: dto.categoryId,
+    });
 
-  // 특정 카테고리의 도서 조회
-  async getBooksByCategory(categoryId: number): Promise<any> {
-    return await this.bookRepository.findByCategoryId(categoryId);
+    if (!category) {
+      throw new NotFoundException('카테고리를 찾을 수 없습니다.');
+    }
+
+    const book = this.bookRepository.create({
+      category,
+      title: dto.title,
+      description: dto.description ?? null,
+      isAvailable: true,
+    });
+
+    const savedBook = await this.bookRepository.save(book);
+
+    return BookResponseDto.from(savedBook);
   }
 }

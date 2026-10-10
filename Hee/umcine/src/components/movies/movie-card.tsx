@@ -1,16 +1,20 @@
 import { Link } from "@tanstack/react-router";
+import { useBookmarkStore } from "../../stores/bookmark-store";
 import type { Movie } from "../../types/movie";
 
 type MovieCardProps = {
   movie: Movie;
-  isBookmarked: boolean;
-  onToggleBookmark: (id: number) => void;
 };
 
 const bookmarkIcon = "/icons/movie-icons/movie-icons/bookmark.svg";
 const bookmarkOutlineIcon = "/icons/movie-icons/movie-icons/bookmark-outline.svg";
 
-export default function MovieCard({ movie, isBookmarked, onToggleBookmark }: MovieCardProps) {
+export default function MovieCard({ movie }: MovieCardProps) {
+  const isBookmarked = useBookmarkStore((state) =>
+    state.bookmarkedMovieIds.includes(movie.id),
+  );
+  const toggleBookmark = useBookmarkStore((state) => state.toggleBookmark);
+
   return (
     <article>
       <div className="relative aspect-[205/232] overflow-hidden rounded-[8px]">
@@ -23,7 +27,7 @@ export default function MovieCard({ movie, isBookmarked, onToggleBookmark }: Mov
         </Link>
         <button
           type="button"
-          onClick={() => onToggleBookmark(movie.id)}
+          onClick={() => toggleBookmark(movie.id)}
           aria-label={`${movie.title} 북마크 ${isBookmarked ? "해제" : "추가"}`}
           aria-pressed={isBookmarked}
           className={`absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-[6px] border ${

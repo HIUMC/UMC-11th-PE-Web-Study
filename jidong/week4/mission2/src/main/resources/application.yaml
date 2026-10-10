@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: "umc-study"
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PW}
+
+  jpa:
+    hibernate:
+      ddl-auto: validate # 이미 만든 테이블과 엔티티 구조가 맞는지만 확인
+    open-in-view: false
+    show-sql: true # ORM이 실제로 실행하는 SQL을 콘솔에서 확인
+    properties:
+      hibernate:
+        format_sql: true

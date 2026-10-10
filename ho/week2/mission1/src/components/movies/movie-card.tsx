@@ -1,17 +1,13 @@
 import { Link } from "@tanstack/react-router";
+import { BookmarkButton } from "../bookmark-button";
 import type { Movie } from "../../types/movie";
-import { cn } from "../../utils/cn";
 
 interface MovieCardProps {
   movie: Movie;
-  onToggleBookmark: (id: number) => void;
 }
 
-export default function MovieCard({ movie, onToggleBookmark }: MovieCardProps) {
-  const { id, title, releaseDate, posterPath, isBookmarked } = movie;
-  const iconPath = isBookmarked
-    ? "/icons/bookmark.svg"
-    : "/icons/bookmark-outline.svg";
+export default function MovieCard({ movie }: MovieCardProps) {
+  const { id, title, releaseDate, posterPath } = movie;
 
   return (
     <article className="min-w-0">
@@ -27,21 +23,7 @@ export default function MovieCard({ movie, onToggleBookmark }: MovieCardProps) {
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
           />
         </Link>
-        <button
-          type="button"
-          className={cn(
-            "absolute right-2.5 top-2.5 flex size-9 items-center justify-center rounded-md border border-white/90 bg-slate-950/60 text-white transition-colors hover:bg-slate-950/80",
-            isBookmarked && "border-blue-600 bg-blue-600 hover:bg-blue-700",
-          )}
-          aria-label={isBookmarked ? "북마크 해제" : "북마크 추가"}
-          aria-pressed={isBookmarked}
-          onClick={() => onToggleBookmark(id)}
-        >
-          <span
-            className="size-[22px] bg-current [mask:var(--icon)_center/contain_no-repeat] [-webkit-mask:var(--icon)_center/contain_no-repeat]"
-            style={{ "--icon": `url(${iconPath})` } as React.CSSProperties}
-          />
-        </button>
+        <BookmarkButton movieId={id} />
       </div>
       <h2 className="mt-2.5 truncate text-[15px] font-bold leading-5">
         <Link

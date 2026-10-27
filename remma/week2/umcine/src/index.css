@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+:root {
+  background-color: #ffffff;
+  color: #111827;
+}
+
+body {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

@@ -46,7 +46,7 @@ export function Header() {
             <img src={"/icons/search.svg"} />
           </Link>
           <Link
-            to="/"
+            to="/login"
             className="bg-[#2563EB] border border-white flex items-center justify-center px-4 rounded-xl text-white font-semibold"
           >
             로그인

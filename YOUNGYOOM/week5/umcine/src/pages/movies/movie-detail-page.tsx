@@ -2,6 +2,7 @@ import { useParams, useRouter } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { movies } from "../../data/movies";
 import { BookmarkButton } from "../../components/bookmark-button";
+import { getMemberRatings } from "../../api/members";
 
 import { getMovieDetail } from "../../api/movies/get-movies";
 import type { GetMovieDetailResponse } from "../../api/movies/get-movies";
@@ -19,8 +20,32 @@ export function MovieDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [ratingMessage, setRatingMessage] = useState("");
+
+  useEffect(() => {
+    let ignore = false;
+    async function loadRating() {
+      try {
+        const ratings = await getMemberRatings(1);
+        if (ignore) return;
+        const review = ratings.find((item) => item.movieId === Number(movieId));
+        console.log("내 리뷰", { movieId: Number(movieId), review });
+        setRating(review?.score ?? 0);
+        setComment(review?.comment ?? "");
+        setRatingMessage(review ? "" : "아직 등록한 평점이 없어요.");
+      } catch {
+        if (!ignore) setRatingMessage("내 평점을 불러오지 못했어요.");
+      }
+    }
+    loadRating();
+    return () => {
+      ignore = true;
+    };
+  }, [movieId]);
 
   // URL의 영화 ID로 상세 정보 요청
+  // 별점 디테일 페이지에서 반영함
   useEffect(() => {
     let ignore = false;
     const id = Number(movieId);
@@ -28,6 +53,8 @@ export function MovieDetailPage() {
     setMovie(null);
     setErrorMessage(null);
     setRating(0);
+    setComment("");
+    setRatingMessage("내 평점을 불러오는 중이에요.");
 
     if (!Number.isSafeInteger(id) || id <= 0) {
       setErrorMessage("올바르지 않은 영화 주소예요.");
@@ -149,7 +176,7 @@ export function MovieDetailPage() {
         <div className="flex w-[294px] shrink-0 flex-col gap-2 border-l border-gray-300 pl-6">
           <h2 className="text-lg font-bold">내 평점</h2>
           <p className="text-[11px] text-gray-500">
-            별점은 필수, 후기는 선택이에요.
+            {ratingMessage || "등록한 평점과 후기예요."}
           </p>
 
           <div className="flex gap-1">
@@ -159,7 +186,7 @@ export function MovieDetailPage() {
                 type="button"
                 aria-label={`${star}점`}
                 aria-pressed={rating === star}
-                onClick={() => setRating(star)}
+                disabled
                 className={`flex h-7 w-7 cursor-pointer items-center justify-center rounded border ${
                   star <= rating ? "border-black" : "border-gray-300 bg-white"
                 }`}
@@ -176,11 +203,14 @@ export function MovieDetailPage() {
           </div>
 
           <textarea
+            value={comment}
+            readOnly
             placeholder="영화를 보고 느낀 점을 남겨보세요."
             className="h-[72px] w-full resize-none rounded-md border border-gray-300 bg-white p-2 text-xs outline-none"
           />
           <button
             type="button"
+            disabled
             className="w-full cursor-pointer rounded-md bg-gray-900 py-2 text-sm font-bold text-white"
           >
             평점 저장

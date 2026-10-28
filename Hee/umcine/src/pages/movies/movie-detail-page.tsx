@@ -1,8 +1,13 @@
 import { Link, useParams } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
-import { movies } from "../../data/movie";
+import { useEffect, useState, type FormEvent } from "react";
+import { getMovieDetail } from "../../api/movies/get-movie-detail";
+import type { TmdbMovieDetail } from "../../api/movies/models";
 import { useBookmarkStore } from "../../stores/bookmark-store";
 import { cn } from "../../utils/cn";
+import { getMovieDetailErrorMessage } from "../../utils/movies/get-movie-detail-error-message";
+import { getTmdbBackdropUrl, getTmdbPosterUrl } from "../../utils/movies/tmdb-image";
+
+/* eslint-disable react-hooks/set-state-in-effect -- Reset request state when the route parameter changes. */
 
 const bookmarkIcon = "/icons/movie-icons/movie-icons/bookmark-outline.svg";
 const starIcon = "/icons/movie-icons/movie-icons/star.svg";
@@ -10,7 +15,14 @@ const starOutlineIcon = "/icons/movie-icons/movie-icons/star-outline.svg";
 
 export function MovieDetailPage() {
   const { movieId } = useParams({ from: "/movies/$movieId" });
-  const movie = movies.find((item) => item.id === Number(movieId));
+  const parsedMovieId = Number(movieId);
+  const isValidMovieId = Number.isInteger(parsedMovieId) && parsedMovieId > 0;
+  const [movie, setMovie] = useState<TmdbMovieDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(isValidMovieId);
+  const [errorMessage, setErrorMessage] = useState<string | null>(
+    isValidMovieId ? null : "올바르지 않은 영화 번호예요.",
+  );
+  const [retryCount, setRetryCount] = useState(0);
   const isBookmarked = useBookmarkStore((state) =>
     movie ? state.bookmarkedMovieIds.includes(movie.id) : false,
   );
@@ -19,10 +31,57 @@ export function MovieDetailPage() {
   const [review, setReview] = useState("");
   const [isSaved, setIsSaved] = useState(false);
 
+  useEffect(() => {
+    let ignore = false;
+
+    if (!isValidMovieId) {
+      setMovie(null);
+      setIsLoading(false);
+      setErrorMessage("올바르지 않은 영화 번호예요.");
+      return;
+    }
+
+    setIsLoading(true);
+    setErrorMessage(null);
+
+    getMovieDetail(parsedMovieId)
+      .then((response) => {
+        if (!ignore) setMovie(response);
+      })
+      .catch((error: unknown) => {
+        if (!ignore) setErrorMessage(getMovieDetailErrorMessage(error));
+      })
+      .finally(() => {
+        if (!ignore) setIsLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [isValidMovieId, parsedMovieId, retryCount]);
+
+  if (isLoading) {
+    return (
+      <main className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-[#F7F8FA]">
+        <p className="text-sm text-[#68707C]">영화 정보를 불러오는 중이에요.</p>
+      </main>
+    );
+  }
+
   if (!movie) {
     return (
       <main className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-[#F7F8FA] px-5 text-center">
         <div>
+          {errorMessage && <p className="mb-2 text-sm text-[#8A929E]">{errorMessage}</p>}
+          {isValidMovieId && errorMessage && (
+            <button
+              type="button"
+              onClick={() => setRetryCount((count) => count + 1)}
+              className="mb-4 rounded-lg bg-[#191D23] px-4 py-2 text-sm font-semibold text-white"
+            >
+              다시 시도
+            </button>
+          )}
           <h1 className="text-2xl font-bold text-[#191D23]">영화를 찾을 수 없어요.</h1>
           <p className="mt-2 text-sm text-[#8A929E]">존재하지 않거나 삭제된 영화입니다.</p>
           <Link
@@ -45,7 +104,7 @@ export function MovieDetailPage() {
     <main className="min-h-[calc(100vh-64px)] bg-[#F7F8FA]">
       <section className="relative min-h-[350px] overflow-hidden sm:min-h-[390px]">
         <img
-          src={movie.backdropPath}
+          src={getTmdbBackdropUrl(movie.backdrop_path) ?? undefined}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 h-full w-full object-cover object-center"
@@ -63,13 +122,13 @@ export function MovieDetailPage() {
             <h1 className="max-w-3xl text-3xl font-bold tracking-[-0.04em] drop-shadow sm:text-[40px] sm:leading-tight">
               {movie.title}
             </h1>
-            <p className="mt-3 text-sm text-white/90">{movie.originalTitle}</p>
+            <p className="mt-3 text-sm text-white/90">{movie.original_title}</p>
             <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold text-white/95">
-              <span>{movie.releaseDate}</span>
+              <span>{movie.release_date}</span>
               <span aria-hidden="true">·</span>
-              <span>{movie.genres.join(" · ")}</span>
+              <span>{movie.genres.map((genre) => genre.name).join(" · ")}</span>
               <span aria-hidden="true">·</span>
-              <span>{movie.runtime}</span>
+              <span>{movie.runtime ? `${movie.runtime}분` : "상영 시간 정보 없음"}</span>
             </div>
           </div>
         </div>
@@ -78,7 +137,7 @@ export function MovieDetailPage() {
       <section className="mx-auto grid max-w-[1100px] gap-10 px-5 py-8 md:grid-cols-[180px_minmax(0,1fr)] lg:grid-cols-[180px_minmax(0,1fr)_300px] lg:gap-8">
         <div>
           <img
-            src={movie.posterPath}
+            src={getTmdbPosterUrl(movie.poster_path) ?? undefined}
             alt={`${movie.title} 포스터`}
             className="aspect-[2/3] w-full max-w-[180px] rounded-xl object-cover shadow-lg"
           />

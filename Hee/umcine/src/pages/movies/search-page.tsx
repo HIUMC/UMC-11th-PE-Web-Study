@@ -1,7 +1,11 @@
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useState, type SubmitEvent } from "react";
-import { movies } from "../../data/movie";
+import { useEffect, useState, type SubmitEvent } from "react";
+import { searchMovies } from "../../api/movies/search-movies";
 import { useBookmarkStore } from "../../stores/bookmark-store";
+import type { Movie } from "../../types/movie";
+import { adaptTmdbMovie } from "../../utils/movies/adapt-tmdb-movie";
+
+/* eslint-disable react-hooks/set-state-in-effect -- The assignment requires resetting search state when query changes. */
 
 const searchIcon = "/icons/movie-icons/movie-icons/search.svg";
 const bookmarkIcon = "/icons/movie-icons/movie-icons/bookmark.svg";
@@ -11,17 +15,44 @@ export function SearchPage() {
   const { query } = useSearch({ from: "/search" });
   const navigate = useNavigate({ from: "/search" });
   const [searchText, setSearchText] = useState(query ?? "");
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   const bookmarkedMovieIds = useBookmarkStore((state) => state.bookmarkedMovieIds);
   const toggleBookmark = useBookmarkStore((state) => state.toggleBookmark);
 
-  const normalizedQuery = query?.trim().toLowerCase() ?? "";
-  const searchResults = normalizedQuery
-    ? movies.filter(
-        (movie) =>
-          movie.title.toLowerCase().includes(normalizedQuery) ||
-          movie.originalTitle.toLowerCase().includes(normalizedQuery),
-      )
-    : [];
+  const normalizedQuery = query?.trim() ?? "";
+
+  useEffect(() => {
+    let ignore = false;
+    const normalizedQuery = query?.trim() ?? "";
+
+    setMovies([]);
+    setErrorMessage(null);
+
+    if (!normalizedQuery) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+
+    searchMovies({ query: normalizedQuery })
+      .then((response) => {
+        if (!ignore) setMovies(response.results.map(adaptTmdbMovie));
+      })
+      .catch(() => {
+        if (!ignore) setErrorMessage("검색 결과를 불러오지 못했어요.");
+      })
+      .finally(() => {
+        if (!ignore) setIsLoading(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [query, retryCount]);
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -100,28 +131,49 @@ export function SearchPage() {
 
         <div className="mt-4 flex items-center justify-between border-b border-[#E1E5EA] pb-4">
           <h2 className="text-sm font-semibold text-[#191D23]">‘{query}’ 검색 결과</h2>
-          <p className="text-xs text-[#9CA3AF]">영화 {searchResults.length}편</p>
+          <p className="text-xs text-[#9CA3AF]">영화 {movies.length}편</p>
         </div>
 
-        {searchResults.length === 0 ? (
+        {isLoading ? (
+          <div className="py-24 text-center">
+            <p className="text-sm text-[#68707C]">검색 결과를 불러오는 중이에요.</p>
+          </div>
+        ) : errorMessage ? (
+          <div className="py-24 text-center">
+            <p className="text-sm text-[#D14343]">{errorMessage}</p>
+            <button
+              type="button"
+              onClick={() => setRetryCount((count) => count + 1)}
+              className="mt-4 rounded-lg bg-[#191D23] px-4 py-2 text-sm font-semibold text-white"
+            >
+              다시 시도
+            </button>
+          </div>
+        ) : movies.length === 0 ? (
           <div className="py-24 text-center">
             <p className="text-lg font-semibold text-[#353B45]">검색 결과가 없어요.</p>
             <p className="mt-2 text-sm text-[#8A929E]">다른 검색어로 다시 찾아보세요.</p>
           </div>
         ) : (
           <ul className="grid grid-cols-1 gap-x-8 md:grid-cols-2">
-            {searchResults.map((movie) => (
+            {movies.map((movie) => (
               <li key={movie.id} className="flex min-w-0 gap-4 border-b border-[#E1E5EA] py-5">
                 <Link
                   to="/movies/$movieId"
                   params={{ movieId: String(movie.id) }}
                   className="h-[158px] w-[108px] shrink-0 overflow-hidden rounded-lg bg-gray-200"
                 >
-                  <img
-                    src={movie.posterPath}
-                    alt={`${movie.title} 포스터`}
-                    className="h-full w-full object-cover transition duration-200 hover:scale-105"
-                  />
+                  {movie.posterPath ? (
+                    <img
+                      src={movie.posterPath}
+                      alt={`${movie.title} 포스터`}
+                      className="h-full w-full object-cover transition duration-200 hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center bg-[#E8EBEF] px-2 text-center text-xs text-[#8A929E]">
+                      포스터 없음
+                    </div>
+                  )}
                 </Link>
 
                 <div className="flex min-w-0 flex-1 flex-col py-1">
@@ -135,7 +187,7 @@ export function SearchPage() {
                     </h3>
                   </Link>
                   <p className="mt-1 line-clamp-1 text-xs text-[#9CA3AF]">
-                    {movie.originalTitle} · {movie.releaseDate}
+                    {movie.originalTitle} · {movie.releaseDate || "개봉일 정보 없음"}
                   </p>
                   <p className="mt-3 line-clamp-2 text-xs leading-5 text-[#68707C]">{movie.overview}</p>
                   <button

@@ -1,29 +1,68 @@
 import { Link, useParams } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BookmarkButton } from "../../components/bookmark-button";
-import { movies } from "../../data/movies";
+import { getMovieDetail } from "../../api/movies/get-movie-detail";
+import type { TmdbMovieDetail } from "../../api/movies/models";
+import { getMovieDetailErrorMessage } from "../../utils/movies/get-movie-detail-error-message";
+import { getTmdbPosterUrl, getTmdbBackdropUrl } from "../../utils/movies/tmdb-image";
+import { MovieImage } from "../../components/movies/movie-image";
 import { cn } from "../../utils/cn";
 
 export function MovieDetailPage() {
   const { movieId } = useParams({ from: "/movies/$movieId" });
-  const movie = movies.find((item) => item.id === Number(movieId));
+  const parsedMovieId = Number(movieId);
+  const isValidId = Number.isInteger(parsedMovieId) && parsedMovieId > 0;
+  const [movie, setMovie] = useState<TmdbMovieDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
 
-  if (!movie) {
+  // 워크북의 useEffect 실습: 영화 ID 변경 시 이전 상세 상태를 초기화해요.
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    let ignore = false;
+    setMovie(null);
+    setErrorMessage(null);
+    setRating(0);
+    if (!Number.isInteger(parsedMovieId) || parsedMovieId <= 0) {
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(true);
+    async function loadMovie() {
+      try {
+        const response = await getMovieDetail(parsedMovieId);
+        if (!ignore) setMovie(response);
+      } catch (error) {
+        if (!ignore) setErrorMessage(getMovieDetailErrorMessage(error));
+      } finally {
+        if (!ignore) setIsLoading(false);
+      }
+    }
+    loadMovie();
+    return () => { ignore = true; };
+  }, [parsedMovieId]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  const message = !isValidId ? "올바르지 않은 영화 번호예요."
+    : isLoading ? "불러오는 중이에요." : errorMessage;
+  if (message || !movie) {
     return (
       <main className="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-8 text-lg font-semibold">
-        영화를 찾을 수 없어요.
+        <p role={isLoading && isValidId ? "status" : "alert"}>{message ?? "영화를 찾을 수 없어요."}</p>
       </main>
     );
   }
 
+  const runtime = movie.runtime === null ? "상영 시간 정보가 없어요."
+    : `${Math.floor(movie.runtime / 60)}시간 ${movie.runtime % 60}분`;
+
   return (
     <main className="flex-1 bg-[#f5f6f8]">
       <section className="relative h-[360px] overflow-hidden bg-slate-900 text-white">
-        <img
-          src={movie.backdropPath}
+        <MovieImage
+          src={getTmdbBackdropUrl(movie.backdrop_path)}
           alt=""
-          aria-hidden="true"
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/35 to-black/10" />
@@ -39,20 +78,20 @@ export function MovieDetailPage() {
               {movie.title}
             </h1>
             <p className="mt-4 text-sm font-medium text-white/90">
-              {movie.originalTitle}
+              {movie.original_title}
             </p>
             <p className="mt-2 text-sm font-semibold">
-              {movie.releaseDate}&nbsp;&nbsp; {movie.genres.join(" · ")}&nbsp;&nbsp; {movie.runtime}
+              {movie.release_date}&nbsp;&nbsp; {movie.genres.map((genre) => genre.name).join(", ")}&nbsp;&nbsp; {runtime}
             </p>
           </div>
         </div>
       </section>
 
       <section className="mx-auto grid w-full max-w-7xl gap-8 px-8 py-8 lg:grid-cols-[210px_minmax(0,1fr)_330px] lg:px-12">
-        <img
-          src={movie.posterPath}
+        <MovieImage
+          src={getTmdbPosterUrl(movie.poster_path)}
           alt={`${movie.title} 포스터`}
-          className="w-full max-w-[210px] rounded-xl object-cover shadow-xl"
+          className="aspect-[2/3] w-full max-w-[210px] rounded-xl object-cover shadow-xl"
         />
 
         <div className="min-w-0 pt-1">

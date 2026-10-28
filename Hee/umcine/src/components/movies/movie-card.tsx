@@ -10,6 +10,7 @@ const bookmarkIcon = "/icons/movie-icons/movie-icons/bookmark.svg";
 const bookmarkOutlineIcon = "/icons/movie-icons/movie-icons/bookmark-outline.svg";
 
 export default function MovieCard({ movie }: MovieCardProps) {
+  const posterUrl = movie.posterPath;
   const isBookmarked = useBookmarkStore((state) =>
     state.bookmarkedMovieIds.includes(movie.id),
   );
@@ -23,7 +24,13 @@ export default function MovieCard({ movie }: MovieCardProps) {
           params={{ movieId: String(movie.id) }}
           className="block h-full"
         >
-          <img src={movie.posterPath} alt={`${movie.title} 포스터`} className="h-full w-full object-cover" />
+          {posterUrl ? (
+            <img src={posterUrl} alt={`${movie.title} 포스터`} className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full items-center justify-center bg-[#E8EBEF] text-xs text-[#8A929E]">
+              포스터 없음
+            </div>
+          )}
         </Link>
         <button
           type="button"
@@ -40,7 +47,9 @@ export default function MovieCard({ movie }: MovieCardProps) {
       <Link to="/movies/$movieId" params={{ movieId: String(movie.id) }} className="block">
         <h2 className="mt-2 text-[12px] font-semibold text-[#191D23]">{movie.title}</h2>
       </Link>
-      <p className="mt-[2px] text-[11px] text-[#9CA3AF]">{movie.releaseDate}</p>
+      <p className="mt-[2px] text-[11px] text-[#9CA3AF]">
+        {movie.releaseDate || "개봉일 정보 없음"}
+      </p>
     </article>
   );
 }

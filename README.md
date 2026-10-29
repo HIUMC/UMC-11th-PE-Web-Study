@@ -1,5 +1,6 @@
 # UMC PE-Web Study Git Workflow
 
+UPDATE MERGE
 UMC PE-Web Study 과제를 업로드하기 위한 Git 사용 방법입니다.
 
 <br />
@@ -112,14 +113,14 @@ git commit -m "커밋 메시지"
 
 ## 📌 커밋 컨벤션
 
-| 타입 | 설명 |
-|-----|-----|
-| FEAT | 새로운 기능 추가 |
-| FIX | 버그, 오류 수정 |
-| CHORE | 코드 수정, 내부 파일 수정 |
-| DOCS | README 등의 문서 수정 |
-| REFACTOR | 코드 리팩토링 |
-| TEST | 테스트 코드 추가 및 수정 |
+| 타입     | 설명                      |
+| -------- | ------------------------- |
+| FEAT     | 새로운 기능 추가          |
+| FIX      | 버그, 오류 수정           |
+| CHORE    | 코드 수정, 내부 파일 수정 |
+| DOCS     | README 등의 문서 수정     |
+| REFACTOR | 코드 리팩토링             |
+| TEST     | 테스트 코드 추가 및 수정  |
 
 예시
 

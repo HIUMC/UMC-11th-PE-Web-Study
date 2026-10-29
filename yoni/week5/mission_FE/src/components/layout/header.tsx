@@ -50,9 +50,16 @@ export function Header() {
             검색
           </Link>
 
-          <span className="text-[12px] font-normal text-[#4b5563]">
+          <Link
+            to="/account"
+            className={
+              pathname === "/account"
+                ? "text-[12px] font-bold text-[#1f1f1f] underline"
+                : "text-[12px] font-normal text-[#4b5563]"
+            }
+          >
             내 정보
-          </span>
+          </Link>
         </nav>
       </div>
 

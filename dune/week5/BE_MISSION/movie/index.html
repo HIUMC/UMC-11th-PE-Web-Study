@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UMC 영화 API 테스트</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            background: #f4f6fa;
+            color: #182235;
+            font-family: system-ui, sans-serif;
+        }
+        main { max-width: 850px; margin: auto; }
+        h1 { margin-bottom: 8px; }
+        .intro { color: #596579; margin-bottom: 28px; }
+        section {
+            background: white;
+            border: 1px solid #dde3ed;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        h2 { margin-top: 0; font-size: 20px; }
+        label { display: block; margin-bottom: 8px; }
+        .controls { display: flex; gap: 10px; }
+        input {
+            flex: 1;
+            min-width: 0;
+            padding: 12px;
+            border: 1px solid #bbc5d5;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        button {
+            padding: 12px 18px;
+            background: #315bea;
+            color: white;
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:disabled { opacity: .6; cursor: wait; }
+        .url { overflow-wrap: anywhere; color: #52617a; }
+        .status { font-weight: bold; }
+        pre {
+            background: #111b2d;
+            color: #dce9ff;
+            padding: 16px;
+            border-radius: 8px;
+            overflow: auto;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h1>UMC 영화 API 테스트</h1>
+    <p class="intro">
+        닉네임·이메일 중복 확인 및 회원별 평점 조회
+    </p>
+
+    <section>
+        <h2>1. 닉네임 중복 확인</h2>
+        <form data-kind="nickname">
+            <label for="nickname">확인할 닉네임</label>
+            <div class="controls">
+                <input id="nickname" value="수현" required>
+                <button type="submit">중복 확인</button>
+            </div>
+        </form>
+        <p class="url">요청 전</p>
+        <p class="status" aria-live="polite">대기 중</p>
+        <pre>응답 JSON이 표시됩니다.</pre>
+    </section>
+
+    <section>
+        <h2>2. 이메일 중복 확인</h2>
+        <form data-kind="email">
+            <label for="email">확인할 이메일</label>
+            <div class="controls">
+                <input id="email" type="email"
+                       placeholder="DB에 저장된 이메일 입력" required>
+                <button type="submit">중복 확인</button>
+            </div>
+        </form>
+        <p class="url">요청 전</p>
+        <p class="status" aria-live="polite">대기 중</p>
+        <pre>응답 JSON이 표시됩니다.</pre>
+    </section>
+
+    <section>
+        <h2>3. 회원별 평점 조회</h2>
+        <form data-kind="ratings">
+            <label for="memberId">회원 ID</label>
+            <div class="controls">
+                <input id="memberId" type="number" min="1"
+                       step="1" value="1" required>
+                <button type="submit">평점 조회</button>
+            </div>
+        </form>
+        <p class="url">요청 전</p>
+        <p class="status" aria-live="polite">대기 중</p>
+        <pre>응답 JSON이 표시됩니다.</pre>
+    </section>
+</main>
+
+<script>
+    const API_BASE = "http://localhost:8080";
+
+    document.querySelectorAll("form").forEach(form => {
+        form.addEventListener("submit", async event => {
+            event.preventDefault();
+
+            const section = form.closest("section");
+            const input = form.querySelector("input");
+            const button = form.querySelector("button");
+            const status = section.querySelector(".status");
+            const output = section.querySelector("pre");
+            const value = input.value.trim();
+
+            if (!value) {
+                status.textContent = "값을 입력해 주세요.";
+                return;
+            }
+
+            const kind = form.dataset.kind;
+            const encoded = encodeURIComponent(value);
+            const path = kind === "ratings"
+                ? `/members/${encoded}/ratings`
+                : `/members/${kind}/${encoded}`;
+            const url = API_BASE + path;
+
+            section.querySelector(".url").textContent = `GET ${url}`;
+            status.textContent = "요청 중…";
+            output.textContent = "";
+            button.disabled = true;
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+
+                let data;
+                try {
+                    data = JSON.parse(text);
+                    output.textContent = JSON.stringify(data, null, 2);
+                } catch {
+                    output.textContent = text || "(응답 본문 없음)";
+                }
+
+                status.textContent =
+                    `HTTP ${response.status} ${response.statusText}`;
+
+                if (response.ok && kind !== "ratings" &&
+                    typeof data?.available === "boolean") {
+                    status.textContent += data.available
+                        ? " · 사용 가능합니다."
+                        : " · 이미 사용 중입니다.";
+                }
+
+                if (response.ok && kind === "ratings" &&
+                    Array.isArray(data)) {
+                    status.textContent += ` · 평점 ${data.length}건`;
+                }
+            } catch (error) {
+                status.textContent = "요청 실패";
+                output.textContent =
+                    "Spring 서버 실행 여부와 CORS 허용 주소를 확인하세요.\n" +
+                    error.message;
+            } finally {
+                button.disabled = false;
+            }
+        });
+    });
+</script>
+</body>
+</html>

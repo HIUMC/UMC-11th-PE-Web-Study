@@ -297,3 +297,44 @@ body {
     gap: 12px;
   }
 }
+.search-poster {
+  display: block;
+  width: 120px;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.detail-backdrop {
+  aspect-ratio: 16 / 9;
+}
+
+.detail-poster {
+  display: block;
+  flex-shrink: 0;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+}
+
+.image-placeholder,
+.movie-poster-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ddd;
+  color: #555;
+}
+
+.footer {
+  gap: 16px;
+  height: auto;
+  min-height: 60px;
+  flex-wrap: wrap;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.footer a,
+.footer img {
+  display: block;
+}

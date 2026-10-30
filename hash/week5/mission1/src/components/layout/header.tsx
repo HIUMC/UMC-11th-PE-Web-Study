@@ -62,7 +62,12 @@ export default function Header() {
             검색
           </Link>
 
-          <span className="text-[#6b7280]">내 정보</span>
+          <Link
+              to="/backend-check"
+              className={cn(menuClassName, "text-[#6b7280]")}
+          >
+            회원 API
+          </Link>
         </nav>
 
         <div className="ml-auto flex items-center gap-3">

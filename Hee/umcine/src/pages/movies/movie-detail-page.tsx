@@ -1,89 +1,84 @@
+
 import { Link, useParams } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState, type FormEvent } from "react";
 import { getMovieDetail } from "../../api/movies/get-movie-detail";
-import type { TmdbMovieDetail } from "../../api/movies/models";
 import { useBookmarkStore } from "../../stores/bookmark-store";
 import { cn } from "../../utils/cn";
 import { getMovieDetailErrorMessage } from "../../utils/movies/get-movie-detail-error-message";
-import { getTmdbBackdropUrl, getTmdbPosterUrl } from "../../utils/movies/tmdb-image";
-
-/* eslint-disable react-hooks/set-state-in-effect -- Reset request state when the route parameter changes. */
+import {
+  getTmdbBackdropUrl,
+  getTmdbPosterUrl,
+} from "../../utils/movies/tmdb-image";
 
 const bookmarkIcon = "/icons/movie-icons/movie-icons/bookmark-outline.svg";
 const starIcon = "/icons/movie-icons/movie-icons/star.svg";
 const starOutlineIcon = "/icons/movie-icons/movie-icons/star-outline.svg";
 
 export function MovieDetailPage() {
-  const { movieId } = useParams({ from: "/movies/$movieId" });
-  const parsedMovieId = Number(movieId);
-  const isValidMovieId = Number.isInteger(parsedMovieId) && parsedMovieId > 0;
-  const [movie, setMovie] = useState<TmdbMovieDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(isValidMovieId);
-  const [errorMessage, setErrorMessage] = useState<string | null>(
-    isValidMovieId ? null : "올바르지 않은 영화 번호예요.",
-  );
-  const [retryCount, setRetryCount] = useState(0);
+  const { movieId: movieIdParam } = useParams({
+    from: "/movies/$movieId",
+  });
+
+  const movieId = Number(movieIdParam);
+  const isValidMovieId = Number.isInteger(movieId) && movieId > 0;
+
+  // TanStack Query로 영화 상세 데이터 관리
+  const movieDetailQuery = useQuery({
+    queryKey: ["movies", "detail", movieId],
+    queryFn: () => getMovieDetail(movieId),
+    enabled: isValidMovieId,
+  });
+
+  const movie = movieDetailQuery.data;
+
   const isBookmarked = useBookmarkStore((state) =>
-    movie ? state.bookmarkedMovieIds.includes(movie.id) : false,
+    movie ? state.bookmarkedMovieIds.includes(movie.id) : false
   );
-  const toggleBookmark = useBookmarkStore((state) => state.toggleBookmark);
+
+  const toggleBookmark = useBookmarkStore(
+    (state) => state.toggleBookmark
+  );
+
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   const [isSaved, setIsSaved] = useState(false);
 
-  useEffect(() => {
-    let ignore = false;
-
-    if (!isValidMovieId) {
-      setMovie(null);
-      setIsLoading(false);
-      setErrorMessage("올바르지 않은 영화 번호예요.");
-      return;
-    }
-
-    setIsLoading(true);
-    setErrorMessage(null);
-
-    getMovieDetail(parsedMovieId)
-      .then((response) => {
-        if (!ignore) setMovie(response);
-      })
-      .catch((error: unknown) => {
-        if (!ignore) setErrorMessage(getMovieDetailErrorMessage(error));
-      })
-      .finally(() => {
-        if (!ignore) setIsLoading(false);
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, [isValidMovieId, parsedMovieId, retryCount]);
-
-  if (isLoading) {
-    return (
-      <main className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-[#F7F8FA]">
-        <p className="text-sm text-[#68707C]">영화 정보를 불러오는 중이에요.</p>
-      </main>
-    );
+  function handleReviewSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsSaved(true);
   }
 
-  if (!movie) {
+  // 잘못된 영화 ID 또는 데이터 요청 오류
+  if (!isValidMovieId || movieDetailQuery.isError) {
+    const errorMessage = !isValidMovieId
+      ? "올바르지 않은 영화 번호예요."
+      : getMovieDetailErrorMessage(movieDetailQuery.error);
+
     return (
       <main className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-[#F7F8FA] px-5 text-center">
         <div>
-          {errorMessage && <p className="mb-2 text-sm text-[#8A929E]">{errorMessage}</p>}
-          {isValidMovieId && errorMessage && (
+          <p className="mb-2 text-sm text-[#8A929E]">
+            {errorMessage}
+          </p>
+
+          {isValidMovieId && movieDetailQuery.isError && (
             <button
               type="button"
-              onClick={() => setRetryCount((count) => count + 1)}
+              onClick={() => movieDetailQuery.refetch()}
               className="mb-4 rounded-lg bg-[#191D23] px-4 py-2 text-sm font-semibold text-white"
             >
               다시 시도
             </button>
           )}
-          <h1 className="text-2xl font-bold text-[#191D23]">영화를 찾을 수 없어요.</h1>
-          <p className="mt-2 text-sm text-[#8A929E]">존재하지 않거나 삭제된 영화입니다.</p>
+
+          <h1 className="text-2xl font-bold text-[#191D23]">
+            영화를 찾을 수 없어요.
+          </h1>
+          <p className="mt-2 text-sm text-[#8A929E]">
+            존재하지 않거나 삭제된 영화입니다.
+          </p>
+
           <Link
             to="/"
             className="mt-6 inline-flex rounded-lg bg-[#191D23] px-5 py-3 text-sm font-semibold text-white"
@@ -95,9 +90,26 @@ export function MovieDetailPage() {
     );
   }
 
-  function handleReviewSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setIsSaved(true);
+  // 로딩 상태
+  if (movieDetailQuery.isPending) {
+    return (
+      <main className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-[#F7F8FA]">
+        <p className="text-sm text-[#68707C]">
+          영화 정보를 불러오는 중이에요.
+        </p>
+      </main>
+    );
+  }
+
+  // 데이터가 없는 경우
+  if (!movie) {
+    return (
+      <main className="flex min-h-[calc(100vh-64px)] items-center justify-center bg-[#F7F8FA]">
+        <p className="text-sm text-[#68707C]">
+          영화 정보를 찾을 수 없어요.
+        </p>
+      </main>
+    );
   }
 
   return (
@@ -113,7 +125,10 @@ export function MovieDetailPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/10" />
 
         <div className="relative mx-auto flex min-h-[350px] max-w-[1100px] flex-col px-5 py-7 text-white sm:min-h-[390px] sm:py-8">
-          <Link to="/" className="flex w-fit items-center gap-2 text-xs font-semibold hover:underline">
+          <Link
+            to="/"
+            className="flex w-fit items-center gap-2 text-xs font-semibold hover:underline"
+          >
             <span aria-hidden="true">‹</span>
             영화 목록
           </Link>
@@ -122,13 +137,23 @@ export function MovieDetailPage() {
             <h1 className="max-w-3xl text-3xl font-bold tracking-[-0.04em] drop-shadow sm:text-[40px] sm:leading-tight">
               {movie.title}
             </h1>
-            <p className="mt-3 text-sm text-white/90">{movie.original_title}</p>
+
+            <p className="mt-3 text-sm text-white/90">
+              {movie.original_title}
+            </p>
+
             <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold text-white/95">
               <span>{movie.release_date}</span>
               <span aria-hidden="true">·</span>
-              <span>{movie.genres.map((genre) => genre.name).join(" · ")}</span>
+              <span>
+                {movie.genres.map((genre) => genre.name).join(" · ")}
+              </span>
               <span aria-hidden="true">·</span>
-              <span>{movie.runtime ? `${movie.runtime}분` : "상영 시간 정보 없음"}</span>
+              <span>
+                {movie.runtime
+                  ? `${movie.runtime}분`
+                  : "상영 시간 정보 없음"}
+              </span>
             </div>
           </div>
         </div>
@@ -144,8 +169,14 @@ export function MovieDetailPage() {
         </div>
 
         <div className="min-w-0 pt-1">
-          <h2 className="text-xl font-bold tracking-[-0.025em] text-[#191D23]">{movie.tagline}</h2>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-[#68707C]">{movie.overview}</p>
+          <h2 className="text-xl font-bold tracking-[-0.025em] text-[#191D23]">
+            {movie.tagline}
+          </h2>
+
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-[#68707C]">
+            {movie.overview}
+          </p>
+
           <button
             type="button"
             onClick={() => toggleBookmark(movie.id)}
@@ -154,7 +185,7 @@ export function MovieDetailPage() {
               "mt-5 inline-flex h-10 items-center gap-2 rounded-lg border px-4 text-sm font-semibold transition",
               isBookmarked
                 ? "border-[#2F6FED] bg-[#2F6FED] text-white"
-                : "border-[#D8DEE8] bg-white text-[#353B45] hover:border-[#2F6FED] hover:text-[#2F6FED]",
+                : "border-[#D8DEE8] bg-white text-[#353B45] hover:border-[#2F6FED] hover:text-[#2F6FED]"
             )}
           >
             <img
@@ -167,12 +198,18 @@ export function MovieDetailPage() {
         </div>
 
         <aside className="border-t border-[#DCE1E8] pt-6 md:col-span-2 lg:col-span-1 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-1">
-          <h2 className="text-lg font-bold text-[#191D23]">내 평점</h2>
-          <p className="mt-1 text-xs text-[#9CA3AF]">별점을 필수, 후기는 선택이에요.</p>
+          <h2 className="text-lg font-bold text-[#191D23]">
+            내 평점
+          </h2>
+
+          <p className="mt-1 text-xs text-[#9CA3AF]">
+            별점을 필수, 후기는 선택이에요.
+          </p>
 
           <form onSubmit={handleReviewSubmit} className="mt-3">
             <fieldset>
               <legend className="sr-only">별점 선택</legend>
+
               <div className="flex gap-2">
                 {[1, 2, 3, 4, 5].map((score) => (
                   <button
@@ -186,11 +223,17 @@ export function MovieDetailPage() {
                     aria-pressed={rating === score}
                     className={cn(
                       "flex h-10 w-10 items-center justify-center rounded-lg border bg-white transition",
-                      score <= rating ? "border-[#F6B923]" : "border-[#DCE1E8] hover:border-[#AEB6C2]",
+                      score <= rating
+                        ? "border-[#F6B923]"
+                        : "border-[#DCE1E8] hover:border-[#AEB6C2]"
                     )}
                   >
                     <img
-                      src={score <= rating ? starIcon : starOutlineIcon}
+                      src={
+                        score <= rating
+                          ? starIcon
+                          : starOutlineIcon
+                      }
                       alt=""
                       className="h-5 w-5"
                     />
@@ -208,6 +251,7 @@ export function MovieDetailPage() {
               placeholder="영화를 보고 느낀 점을 남겨보세요."
               className="mt-3 h-24 w-full resize-none rounded-lg border border-[#DCE1E8] bg-white p-3 text-sm text-[#353B45] outline-none transition placeholder:text-[#A7ADB7] focus:border-[#2F6FED]"
             />
+
             <button
               type="submit"
               disabled={rating === 0}
@@ -221,8 +265,14 @@ export function MovieDetailPage() {
 
       <footer className="mt-12 border-t border-[#E1E5EA] bg-white px-5 py-5">
         <div className="mx-auto flex max-w-[1100px] items-center justify-center gap-2 text-center text-[11px] text-[#8A929E] sm:justify-end">
-          <img src="/umcine-images/images/logos/tmdb-logo.svg" alt="TMDB" className="h-3 w-auto" />
-          <span>This product uses the TMDB API but is not endorsed or certified by TMDB.</span>
+          <img
+            src="/umcine-images/images/logos/tmdb-logo.svg"
+            alt="TMDB"
+            className="h-3 w-auto"
+          />
+          <span>
+            This product uses the TMDB API but is not endorsed or certified by TMDB.
+          </span>
         </div>
       </footer>
     </main>

@@ -1,11 +1,10 @@
+
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useEffect, useState, type SubmitEvent } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState, type SubmitEvent } from "react";
 import { searchMovies } from "../../api/movies/search-movies";
 import { useBookmarkStore } from "../../stores/bookmark-store";
-import type { Movie } from "../../types/movie";
 import { adaptTmdbMovie } from "../../utils/movies/adapt-tmdb-movie";
-
-/* eslint-disable react-hooks/set-state-in-effect -- The assignment requires resetting search state when query changes. */
 
 const searchIcon = "/icons/movie-icons/movie-icons/search.svg";
 const bookmarkIcon = "/icons/movie-icons/movie-icons/bookmark.svg";
@@ -14,56 +13,43 @@ const bookmarkOutlineIcon = "/icons/movie-icons/movie-icons/bookmark-outline.svg
 export function SearchPage() {
   const { query } = useSearch({ from: "/search" });
   const navigate = useNavigate({ from: "/search" });
+
   const [searchText, setSearchText] = useState(query ?? "");
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
-  const bookmarkedMovieIds = useBookmarkStore((state) => state.bookmarkedMovieIds);
-  const toggleBookmark = useBookmarkStore((state) => state.toggleBookmark);
+
+  const bookmarkedMovieIds = useBookmarkStore(
+    (state) => state.bookmarkedMovieIds
+  );
+  const toggleBookmark = useBookmarkStore(
+    (state) => state.toggleBookmark
+  );
 
   const normalizedQuery = query?.trim() ?? "";
 
-  useEffect(() => {
-    let ignore = false;
-    const normalizedQuery = query?.trim() ?? "";
+  // TanStack Query로 검색 데이터 관리
+  const searchQuery = useQuery({
+    queryKey: ["movies", "search", { query: normalizedQuery }],
+    queryFn: () => searchMovies({ query: normalizedQuery }),
+    enabled: normalizedQuery.length > 0,
+  });
 
-    setMovies([]);
-    setErrorMessage(null);
-
-    if (!normalizedQuery) {
-      setIsLoading(false);
-      return;
-    }
-
-    setIsLoading(true);
-
-    searchMovies({ query: normalizedQuery })
-      .then((response) => {
-        if (!ignore) setMovies(response.results.map(adaptTmdbMovie));
-      })
-      .catch(() => {
-        if (!ignore) setErrorMessage("검색 결과를 불러오지 못했어요.");
-      })
-      .finally(() => {
-        if (!ignore) setIsLoading(false);
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, [query, retryCount]);
+  const movies =
+    searchQuery.data?.results.map(adaptTmdbMovie) ?? [];
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
+
     const nextQuery = searchText.trim();
-    navigate({ search: nextQuery ? { query: nextQuery } : {} });
+
+    navigate({
+      search: nextQuery ? { query: nextQuery } : {},
+    });
   }
 
   function clearSearch() {
     setSearchText("");
   }
 
+  // 검색어가 없을 때
   if (!normalizedQuery) {
     return (
       <main className="flex min-h-[calc(100vh-64px)] items-start justify-center bg-[#F7F8FA] px-5 pt-32 sm:pt-40">
@@ -71,11 +57,16 @@ export function SearchPage() {
           <h1 className="mb-7 text-2xl font-bold tracking-[-0.03em] text-[#191D23] sm:text-[32px]">
             어떤 영화를 찾고 있나요?
           </h1>
+
           <form
             onSubmit={handleSubmit}
             className="flex h-12 items-center rounded-lg border border-[#191D23] bg-white px-4 shadow-sm"
           >
-            <img src={searchIcon} alt="" className="mr-3 h-5 w-5 opacity-60" />
+            <img
+              src={searchIcon}
+              alt=""
+              className="mr-3 h-5 w-5 opacity-60"
+            />
             <input
               aria-label="검색어"
               value={searchText}
@@ -98,13 +89,19 @@ export function SearchPage() {
   return (
     <main className="min-h-[calc(100vh-64px)] bg-[#F7F8FA]">
       <div className="mx-auto max-w-[1100px] px-5 py-7 sm:py-9">
-        <h1 className="mb-5 text-[28px] font-bold tracking-[-0.03em] text-[#191D23]">영화 검색</h1>
+        <h1 className="mb-5 text-[28px] font-bold tracking-[-0.03em] text-[#191D23]">
+          영화 검색
+        </h1>
 
         <form
           onSubmit={handleSubmit}
           className="flex h-12 items-center rounded-lg border border-[#E1E5EA] bg-white px-4 shadow-sm"
         >
-          <img src={searchIcon} alt="" className="mr-3 h-5 w-5 opacity-60" />
+          <img
+            src={searchIcon}
+            alt=""
+            className="mr-3 h-5 w-5 opacity-60"
+          />
           <input
             aria-label="검색어"
             value={searchText}
@@ -130,20 +127,28 @@ export function SearchPage() {
         </form>
 
         <div className="mt-4 flex items-center justify-between border-b border-[#E1E5EA] pb-4">
-          <h2 className="text-sm font-semibold text-[#191D23]">‘{query}’ 검색 결과</h2>
-          <p className="text-xs text-[#9CA3AF]">영화 {movies.length}편</p>
+          <h2 className="text-sm font-semibold text-[#191D23]">
+            ‘{query}’ 검색 결과
+          </h2>
+          <p className="text-xs text-[#9CA3AF]">
+            영화 {movies.length}편
+          </p>
         </div>
 
-        {isLoading ? (
+        {searchQuery.isPending ? (
           <div className="py-24 text-center">
-            <p className="text-sm text-[#68707C]">검색 결과를 불러오는 중이에요.</p>
+            <p className="text-sm text-[#68707C]">
+              검색 결과를 불러오는 중이에요.
+            </p>
           </div>
-        ) : errorMessage ? (
+        ) : searchQuery.isError ? (
           <div className="py-24 text-center">
-            <p className="text-sm text-[#D14343]">{errorMessage}</p>
+            <p className="text-sm text-[#D14343]">
+              검색 결과를 불러오지 못했어요.
+            </p>
             <button
               type="button"
-              onClick={() => setRetryCount((count) => count + 1)}
+              onClick={() => searchQuery.refetch()}
               className="mt-4 rounded-lg bg-[#191D23] px-4 py-2 text-sm font-semibold text-white"
             >
               다시 시도
@@ -151,13 +156,20 @@ export function SearchPage() {
           </div>
         ) : movies.length === 0 ? (
           <div className="py-24 text-center">
-            <p className="text-lg font-semibold text-[#353B45]">검색 결과가 없어요.</p>
-            <p className="mt-2 text-sm text-[#8A929E]">다른 검색어로 다시 찾아보세요.</p>
+            <p className="text-lg font-semibold text-[#353B45]">
+              검색 결과가 없어요.
+            </p>
+            <p className="mt-2 text-sm text-[#8A929E]">
+              다른 검색어로 다시 찾아보세요.
+            </p>
           </div>
         ) : (
           <ul className="grid grid-cols-1 gap-x-8 md:grid-cols-2">
             {movies.map((movie) => (
-              <li key={movie.id} className="flex min-w-0 gap-4 border-b border-[#E1E5EA] py-5">
+              <li
+                key={movie.id}
+                className="flex min-w-0 gap-4 border-b border-[#E1E5EA] py-5"
+              >
                 <Link
                   to="/movies/$movieId"
                   params={{ movieId: String(movie.id) }}
@@ -186,15 +198,23 @@ export function SearchPage() {
                       {movie.title}
                     </h3>
                   </Link>
+
                   <p className="mt-1 line-clamp-1 text-xs text-[#9CA3AF]">
-                    {movie.originalTitle} · {movie.releaseDate || "개봉일 정보 없음"}
+                    {movie.originalTitle} ·{" "}
+                    {movie.releaseDate || "개봉일 정보 없음"}
                   </p>
-                  <p className="mt-3 line-clamp-2 text-xs leading-5 text-[#68707C]">{movie.overview}</p>
+
+                  <p className="mt-3 line-clamp-2 text-xs leading-5 text-[#68707C]">
+                    {movie.overview}
+                  </p>
+
                   <button
                     type="button"
                     onClick={() => toggleBookmark(movie.id)}
                     aria-label={`${movie.title} 북마크 ${
-                      bookmarkedMovieIds.includes(movie.id) ? "해제" : "추가"
+                      bookmarkedMovieIds.includes(movie.id)
+                        ? "해제"
+                        : "추가"
                     }`}
                     aria-pressed={bookmarkedMovieIds.includes(movie.id)}
                     className="mt-3 flex w-fit items-center gap-1.5 rounded-md border border-[#D8DEE8] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#353B45]"
@@ -208,8 +228,11 @@ export function SearchPage() {
                       alt=""
                       className="h-4 w-4"
                     />
-                    {bookmarkedMovieIds.includes(movie.id) ? "북마크 해제" : "북마크 추가"}
+                    {bookmarkedMovieIds.includes(movie.id)
+                      ? "북마크 해제"
+                      : "북마크 추가"}
                   </button>
+
                   <Link
                     to="/movies/$movieId"
                     params={{ movieId: String(movie.id) }}

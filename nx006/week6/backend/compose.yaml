@@ -1,0 +1,67 @@
+name: umc-movie
+x-app: &app
+  image: umc-movie-api:local
+  build: .
+  env_file: .env
+  environment: &app-env
+    DB_HOST: db
+    DB_PORT: ${DB_PORT:?DB_PORT is required}
+    DB_USER: ${DB_USER:?DB_USER is required}
+    DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    DB_NAME: ${DB_NAME:?DB_NAME is required}
+    TZ: UTC
+    NODE_ENV: development
+services:
+  db:
+    image: mysql:8.4
+    command: ["mysqld", "--port=${DB_PORT:?DB_PORT is required}", "--default-time-zone=+00:00", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci"]
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: ${DB_NAME:?DB_NAME is required}
+      DB_PORT: ${DB_PORT:?DB_PORT is required}
+    ports:
+      - "127.0.0.1:${DB_PORT}:${DB_PORT}"
+    volumes:
+      - movie-mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_ROOT_PASSWORD mysql --protocol=TCP -h 127.0.0.1 -P $$DB_PORT -u root -Nse 'SELECT 1' >/dev/null"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+  db-prepare:
+    <<: *app
+    command: ["node", "scripts/database.mjs", "prepare"]
+    depends_on:
+      db:
+        condition: service_healthy
+  api:
+    <<: *app
+    container_name: umc-movie
+    environment:
+      <<: *app-env
+      PORT: ${PORT:-3000}
+      CORS_MODE: ${CORS_MODE:-restricted}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:5174,http://localhost:5176}
+    ports:
+      - "127.0.0.1:${PORT:-3000}:${PORT:-3000}"
+    depends_on:
+      db-prepare:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "scripts/healthcheck.mjs"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  mock-frontend:
+    image: node:24-bookworm-slim
+    working_dir: /app
+    command: ["node", "mock-frontend/server.mjs"]
+    volumes:
+      - ./mock-frontend:/app/mock-frontend:ro
+    ports:
+      - "127.0.0.1:5176:5173"
+      - "127.0.0.1:5175:5175"
+volumes:
+  movie-mysql:

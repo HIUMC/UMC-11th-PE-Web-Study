@@ -1,8 +1,8 @@
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useEffect, useState, type SubmitEvent } from "react";
+import { useState, type SubmitEvent } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { BookmarkButton } from "../../components/bookmark-button";
 import { searchMovies } from "../../api/movies/search-movies";
-import type { TmdbMovieListItem } from "../../api/movies/models";
 import { MovieImage } from "../../components/movies/movie-image";
 import { getTmdbPosterUrl } from "../../utils/movies/tmdb-image";
 import { cn } from "../../utils/cn";
@@ -19,41 +19,14 @@ export function SearchPage() {
   }
 
   const normalizedQuery = query?.trim() ?? "";
-  const [movies, setMovies] = useState<TmdbMovieListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [totalResults, setTotalResults] = useState(0);
+  const searchQuery = useQuery({
+    queryKey: ["movies", "search", { query: normalizedQuery }],
+    queryFn: () => searchMovies({ query: normalizedQuery }),
+    enabled: normalizedQuery.length > 0,
+  });
 
-  // 워크북의 useEffect 실습: 검색 조건 변경 시 이전 요청 상태를 초기화해요.
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    let ignore = false;
-    const normalizedQuery = query?.trim() ?? "";
-    setMovies([]);
-    setTotalResults(0);
-    setErrorMessage(null);
-
-    if (!normalizedQuery) {
-      setIsLoading(false);
-      return;
-    }
-    setIsLoading(true);
-    searchMovies({ query: normalizedQuery })
-      .then((response) => {
-        if (!ignore) {
-          setMovies(response.results);
-          setTotalResults(response.total_results);
-        }
-      })
-      .catch(() => {
-        if (!ignore) setErrorMessage("검색 결과를 불러오지 못했어요.");
-      })
-      .finally(() => {
-        if (!ignore) setIsLoading(false);
-      });
-    return () => { ignore = true; };
-  }, [query]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+  const searchResults = searchQuery.data?.results ?? [];
+  const totalResults = searchQuery.data?.total_results ?? 0;
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -139,21 +112,21 @@ export function SearchPage() {
         <div className="flex items-center justify-between border-b border-slate-200 py-4">
           <h2 className="text-lg font-bold">‘{query}’ 검색 결과</h2>
           <p className="text-sm text-slate-400">
-            {isLoading ? "검색 중" : errorMessage ? "검색 실패" : `영화 ${totalResults}편 · 1페이지`}
+            {searchQuery.isLoading ? "검색 중" : searchQuery.isError ? "검색 실패" : `영화 ${totalResults}편 · 1페이지`}
           </p>
         </div>
 
-        {isLoading ? (
+        {searchQuery.isLoading ? (
           <p role="status" className="py-24 text-center text-slate-500">불러오는 중이에요.</p>
-        ) : errorMessage ? (
-          <p role="alert" className="py-24 text-center text-slate-500">{errorMessage}</p>
-        ) : movies.length === 0 ? (
+        ) : searchQuery.isError ? (
+          <p role="alert" className="py-24 text-center text-slate-500">{searchQuery.error.message}</p>
+        ) : searchQuery.isSuccess && searchResults.length === 0 ? (
           <div className="flex min-h-72 items-center justify-center text-base font-medium text-slate-500">
             검색 결과가 없어요.
           </div>
         ) : (
           <ul className="grid grid-cols-1 gap-x-10 md:grid-cols-2">
-            {movies.map((movie) => (
+            {searchResults.map((movie) => (
               <li
                 key={movie.id}
                 className="flex min-w-0 gap-5 border-b border-slate-200 py-6"

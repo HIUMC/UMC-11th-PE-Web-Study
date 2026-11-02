@@ -1,5 +1,6 @@
 import { Link, useParams } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { BookmarkButton } from "../../components/bookmark-button";
 import { getMovieDetail } from "../../api/movies/get-movie-detail";
 import type { TmdbMovieDetail } from "../../api/movies/models";
@@ -9,50 +10,38 @@ import { MovieImage } from "../../components/movies/movie-image";
 import { cn } from "../../utils/cn";
 
 export function MovieDetailPage() {
-  const { movieId } = useParams({ from: "/movies/$movieId" });
-  const parsedMovieId = Number(movieId);
-  const isValidId = Number.isInteger(parsedMovieId) && parsedMovieId > 0;
-  const [movie, setMovie] = useState<TmdbMovieDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [rating, setRating] = useState(0);
+  const { movieId: movieIdParam } = useParams({ from: "/movies/$movieId" });
+  const movieId = Number(movieIdParam);
+  const isValidMovieId = Number.isInteger(movieId) && movieId > 0;
 
-  // 워크북의 useEffect 실습: 영화 ID 변경 시 이전 상세 상태를 초기화해요.
-  /* eslint-disable react-hooks/set-state-in-effect */
-  useEffect(() => {
-    let ignore = false;
-    setMovie(null);
-    setErrorMessage(null);
-    setRating(0);
-    if (!Number.isInteger(parsedMovieId) || parsedMovieId <= 0) {
-      setIsLoading(false);
-      return;
-    }
-    setIsLoading(true);
-    async function loadMovie() {
-      try {
-        const response = await getMovieDetail(parsedMovieId);
-        if (!ignore) setMovie(response);
-      } catch (error) {
-        if (!ignore) setErrorMessage(getMovieDetailErrorMessage(error));
-      } finally {
-        if (!ignore) setIsLoading(false);
-      }
-    }
-    loadMovie();
-    return () => { ignore = true; };
-  }, [parsedMovieId]);
-  /* eslint-enable react-hooks/set-state-in-effect */
+  const movieDetailQuery = useQuery({
+    queryKey: ["movies", "detail", movieId],
+    queryFn: () => getMovieDetail(movieId),
+    enabled: isValidMovieId,
+  });
 
-  const message = !isValidId ? "올바르지 않은 영화 번호예요."
-    : isLoading ? "불러오는 중이에요." : errorMessage;
-  if (message || !movie) {
+  if (!isValidMovieId || movieDetailQuery.isPending || movieDetailQuery.isError) {
+    const message = !isValidMovieId
+      ? "올바르지 않은 영화 번호예요."
+      : movieDetailQuery.isPending
+        ? "불러오는 중이에요."
+        : getMovieDetailErrorMessage(movieDetailQuery.error);
+
     return (
       <main className="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-8 text-lg font-semibold">
-        <p role={isLoading && isValidId ? "status" : "alert"}>{message ?? "영화를 찾을 수 없어요."}</p>
+        <p role={isValidMovieId && movieDetailQuery.isPending ? "status" : "alert"}>
+          {message}
+        </p>
       </main>
     );
   }
+
+  return <MovieDetailContent key={movieId} movie={movieDetailQuery.data} />;
+}
+
+function MovieDetailContent({ movie }: { movie: TmdbMovieDetail }) {
+  // 영화가 바뀌면 key가 바뀌어 이전 영화에 입력한 평점도 초기화돼요.
+  const [rating, setRating] = useState(0);
 
   const runtime = movie.runtime === null ? "상영 시간 정보가 없어요."
     : `${Math.floor(movie.runtime / 60)}시간 ${movie.runtime % 60}분`;

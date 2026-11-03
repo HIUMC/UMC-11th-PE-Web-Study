@@ -1,8 +1,7 @@
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import BookmarkButton from "../../components/bookmark-button";
 import { searchMovies } from "../../api/movies/search-movies";
-import type { TmdbMovieListItem } from "../../api/movies/models";
 import { getTmdbPosterUrl } from "../../utils/movies/tmdb-image";
 
 export function SearchPage() {
@@ -15,38 +14,14 @@ function SearchResults({ query }: { query: string }) {
   const navigate = useNavigate({ from: "/search" });
   const normalizedQuery = query.trim();
 
-  const [movies, setMovies] = useState<TmdbMovieListItem[]>([]);
-  const [totalResults, setTotalResults] = useState(0);
-  const [isLoading, setIsLoading] = useState(Boolean(normalizedQuery));
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const searchQuery = useQuery({
+    queryKey: ["movies", "search", { query: normalizedQuery }],
+    queryFn: () => searchMovies({ query: normalizedQuery }),
+    enabled: normalizedQuery.length > 0,
+  });
 
-  useEffect(() => {
-    let ignore = false;
-
-    if (!normalizedQuery) return;
-
-    searchMovies({ query: normalizedQuery })
-      .then((response) => {
-        if (!ignore) {
-          setMovies(response.results);
-          setTotalResults(response.total_results);
-        }
-      })
-      .catch(() => {
-        if (!ignore) {
-          setErrorMessage("검색 결과를 불러오지 못했어요.");
-        }
-      })
-      .finally(() => {
-        if (!ignore) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, [normalizedQuery]);
+  const movies = searchQuery.data?.results ?? [];
+  const totalResults = searchQuery.data?.total_results ?? 0;
 
   return (
     <main className="main">
@@ -81,13 +56,13 @@ function SearchResults({ query }: { query: string }) {
           <>
             <h2>‘{query}’ 검색 결과</h2>
 
-            {isLoading ? (
+            {searchQuery.isLoading ? (
               <p role="status">검색 결과를 불러오는 중이에요.</p>
-            ) : errorMessage ? (
-              <p role="alert">{errorMessage}</p>
-            ) : movies.length === 0 ? (
+            ) : searchQuery.isError ? (
+              <p role="alert">검색 결과를 불러오지 못했어요.</p>
+            ) : searchQuery.isSuccess && movies.length === 0 ? (
               <p>검색 결과가 없어요.</p>
-            ) : (
+            ) : searchQuery.isSuccess ? (
               <>
                 <p>
                   영화 {totalResults}편 · 현재 {movies.length}편 표시
@@ -137,7 +112,7 @@ function SearchResults({ query }: { query: string }) {
                   })}
                 </ul>
               </>
-            )}
+            ) : null}
           </>
         )}
       </div>

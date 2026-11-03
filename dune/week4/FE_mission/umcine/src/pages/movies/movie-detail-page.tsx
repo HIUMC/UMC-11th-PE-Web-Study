@@ -1,8 +1,7 @@
 import { Link, useParams } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import BookmarkButton from "../../components/bookmark-button";
 import { getMovieDetail } from "../../api/movies/get-movie-detail";
-import type { TmdbMovieDetail } from "../../api/movies/models";
 import { getMovieDetailErrorMessage } from "../../utils/movies/get-movie-detail-error-message";
 import {
   getTmdbPosterUrl,
@@ -19,51 +18,33 @@ export function MovieDetailPage() {
 function MovieDetail({ movieId }: { movieId: number }) {
   const isValidId = Number.isInteger(movieId) && movieId > 0;
 
-  const [movie, setMovie] = useState<TmdbMovieDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(isValidId);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const movieDetailQuery = useQuery({
+    queryKey: ["movies", "detail", movieId],
+    queryFn: () => getMovieDetail(movieId),
+    enabled: isValidId,
+    staleTime: 30 * 1000, // 30초 동안 캐시 유지
+  });
 
-  useEffect(() => {
-    let ignore = false;
+  const movie = movieDetailQuery.data;
 
-    if (!Number.isInteger(movieId) || movieId <= 0) return;
-
-    async function loadMovie() {
-      try {
-        const response = await getMovieDetail(movieId);
-
-        if (!ignore) {
-          setMovie(response);
-        }
-      } catch (error) {
-        if (!ignore) {
-          setErrorMessage(getMovieDetailErrorMessage(error));
-        }
-      } finally {
-        if (!ignore) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadMovie();
-
-    return () => {
-      ignore = true;
-    };
-  }, [movieId]);
-
-  if (!isValidId || isLoading || errorMessage || !movie) {
+  if (
+    !isValidId ||
+    movieDetailQuery.isPending ||
+    movieDetailQuery.isError ||
+    !movie
+  ) {
     const message = !isValidId
       ? "올바르지 않은 영화 번호예요."
-      : isLoading
+      : movieDetailQuery.isPending
         ? "영화 정보를 불러오는 중이에요."
-        : errorMessage ?? "영화를 찾을 수 없어요.";
+        : movieDetailQuery.isError
+          ? getMovieDetailErrorMessage(movieDetailQuery.error)
+          : "영화를 찾을 수 없어요.";
 
     return (
       <main className="main">
         <div className="page-content">
-          <p role={isValidId && isLoading ? "status" : "alert"}>
+          <p role={isValidId && movieDetailQuery.isPending ? "status" : "alert"}>
             {message}
           </p>
 

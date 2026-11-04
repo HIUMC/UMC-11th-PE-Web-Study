@@ -1,0 +1,9 @@
+# 민감 정보
+.env
+
+# Gradle / IntelliJ
+.gradle/
+build/
+.idea/
+*.iml
+out/

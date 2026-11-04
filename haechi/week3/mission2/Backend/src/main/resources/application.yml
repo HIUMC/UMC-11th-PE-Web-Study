@@ -1,0 +1,13 @@
+spring:
+  config:
+    # 프로젝트 루트의 .env 파일을 읽어 환경변수로 사용 (파일이 없어도 에러 X)
+    import: optional:file:.env[.properties]
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:umc_book}?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+server:
+  error:
+    include-message: always   # 404 등 에러 응답에 message 표시

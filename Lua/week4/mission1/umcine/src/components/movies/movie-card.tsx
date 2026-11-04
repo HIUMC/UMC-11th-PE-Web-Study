@@ -1,0 +1,13 @@
+import { Link } from "@tanstack/react-router";
+import type { Movie } from "../../types/movie";
+import { useBookmarkStore } from "../../stores/bookmark-store";
+import { cn } from "../../utils/cn";
+
+interface MovieCardProps { movie: Movie; }
+
+export default function MovieCard({ movie }: MovieCardProps) {
+  const isBookmarked = useBookmarkStore((state) => state.bookmarkedMovieIds.includes(movie.id));
+  const toggleBookmark = useBookmarkStore((state) => state.toggleBookmark);
+
+  return <article className="min-w-0"><div className="relative aspect-[2/3] overflow-hidden rounded-[10px] bg-zinc-100 shadow-[0_8px_22px_rgba(0,0,0,0.08)]"><Link to="/movies/$movieId" params={{ movieId: String(movie.id) }} aria-label={`${movie.title} 상세 보기`}><img className="size-full object-cover transition-transform duration-200 hover:scale-[1.025]" src={movie.posterPath} alt={`${movie.title} 포스터`} /></Link><button className={cn("absolute right-3 top-3 grid size-[38px] place-items-center rounded-full bg-white/90 shadow-md transition hover:-translate-y-0.5 hover:bg-white", isBookmarked && "bg-blue-50")} type="button" aria-label={isBookmarked ? `${movie.title} 북마크 해제` : `${movie.title} 북마크 추가`} aria-pressed={isBookmarked} onClick={() => toggleBookmark(movie.id)}><img src={isBookmarked ? "/icons/bookmark.svg" : "/icons/bookmark-outline.svg"} alt="" className="size-[19px]" /></button></div><div className="pt-3.5"><Link to="/movies/$movieId" params={{ movieId: String(movie.id) }} className="block truncate text-base leading-[1.35] font-bold tracking-[-0.45px] text-zinc-900">{movie.title}</Link><p className="mt-1 truncate text-xs text-zinc-400">{movie.originalTitle}</p><div className="mt-2 flex gap-1.5 whitespace-nowrap text-xs text-zinc-600"><span>{movie.releaseDate}</span><span aria-hidden="true">·</span><span className="truncate">{movie.genres.slice(0, 2).join(" / ")}</span></div></div></article>;
+}

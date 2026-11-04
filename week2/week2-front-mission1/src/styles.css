@@ -1,0 +1,408 @@
+:root {
+  color: #f4f6fb;
+  background: #101114;
+  font-family: Inter, Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-synthesis: none;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at 17% 0%, rgba(45, 70, 116, 0.22), transparent 28rem),
+    linear-gradient(180deg, #14151a 0%, #101114 34%, #0d0e11 100%);
+}
+
+button,
+a {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+.app-shell {
+  min-height: 100vh;
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 76px;
+  padding: 0 72px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(16, 17, 20, 0.9);
+  backdrop-filter: blur(18px);
+}
+
+.brand,
+.main-nav,
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  gap: 12px;
+  min-width: 190px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.brand-logo {
+  width: 38px;
+  height: 28px;
+  object-fit: contain;
+}
+
+.brand-name {
+  color: #ffffff;
+}
+
+.main-nav {
+  gap: 38px;
+  color: #a8adb8;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.main-nav a {
+  position: relative;
+  padding: 28px 0;
+}
+
+.main-nav a.active {
+  color: #ffffff;
+}
+
+.main-nav a.active::after {
+  position: absolute;
+  right: 0;
+  bottom: 18px;
+  left: 0;
+  height: 3px;
+  border-radius: 999px;
+  background: #f04252;
+  content: "";
+}
+
+.header-actions {
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 190px;
+}
+
+.icon-button,
+.profile-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.icon-button img,
+.profile-button img {
+  width: 22px;
+  height: 22px;
+}
+
+.profile-button {
+  background: #f04252;
+}
+
+.page-content {
+  width: min(1136px, calc(100% - 144px));
+  margin: 0 auto;
+  padding: 56px 0 72px;
+}
+
+.page-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  color: #f04252;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.page-heading h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.page-description {
+  margin: 12px 0 0;
+  color: #969ca8;
+  font-size: 16px;
+}
+
+.movie-count {
+  margin: 0 0 6px;
+  color: #aeb4bf;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.movie-count strong {
+  color: #ffffff;
+  font-size: 24px;
+}
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 34px 20px;
+}
+
+.movie-card {
+  min-width: 0;
+}
+
+.poster-wrap {
+  position: relative;
+  aspect-ratio: 214 / 321;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #20232b;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.34);
+}
+
+.movie-poster {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 180ms ease;
+}
+
+.movie-card:hover .movie-poster {
+  transform: scale(1.035);
+}
+
+.poster-shade {
+  position: absolute;
+  inset: auto 0 0;
+  height: 96px;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.58));
+}
+
+.bookmark-button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 8px;
+  background: rgba(15, 16, 19, 0.68);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.bookmark-button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(15, 16, 19, 0.9);
+}
+
+.bookmark-button.bookmarked {
+  border-color: rgba(240, 66, 82, 0.7);
+  background: #f04252;
+}
+
+.bookmark-button img {
+  width: 20px;
+  height: 20px;
+}
+
+.movie-info {
+  padding-top: 14px;
+}
+
+.movie-info h2 {
+  overflow: hidden;
+  margin: 0;
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.movie-original-title {
+  overflow: hidden;
+  margin: 5px 0 9px;
+  color: #9da3ae;
+  font-size: 13px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.movie-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 20px;
+  color: #c9ced7;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.meta-divider {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: #646a75;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 56px;
+}
+
+.pagination-arrow,
+.page-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  color: #d8dde6;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.pagination-arrow img {
+  width: 20px;
+  height: 20px;
+}
+
+.pagination-arrow:disabled {
+  opacity: 0.38;
+}
+
+.page-number.selected {
+  color: #ffffff;
+  background: #f04252;
+}
+
+@media (max-width: 1024px) {
+  .site-header {
+    padding: 0 40px;
+  }
+
+  .page-content {
+    width: min(720px, calc(100% - 80px));
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .site-header {
+    gap: 20px;
+    padding: 0 24px;
+  }
+
+  .brand,
+  .header-actions {
+    min-width: auto;
+  }
+
+  .main-nav {
+    gap: 20px;
+  }
+
+  .page-content {
+    width: calc(100% - 48px);
+    padding-top: 40px;
+  }
+
+  .page-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .movie-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header {
+    height: auto;
+    min-height: 76px;
+  }
+
+  .brand-name,
+  .main-nav {
+    display: none;
+  }
+
+  .page-content {
+    width: calc(100% - 32px);
+    padding: 32px 0 56px;
+  }
+
+  .page-heading h1 {
+    font-size: 32px;
+  }
+
+  .movie-grid {
+    grid-template-columns: 1fr;
+  }
+}

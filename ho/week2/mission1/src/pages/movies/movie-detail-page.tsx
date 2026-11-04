@@ -1,29 +1,57 @@
 import { Link, useParams } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { BookmarkButton } from "../../components/bookmark-button";
-import { movies } from "../../data/movies";
+import { getMovieDetail } from "../../api/movies/get-movie-detail";
+import type { TmdbMovieDetail } from "../../api/movies/models";
+import { getMovieDetailErrorMessage } from "../../utils/movies/get-movie-detail-error-message";
+import { getTmdbPosterUrl, getTmdbBackdropUrl } from "../../utils/movies/tmdb-image";
+import { MovieImage } from "../../components/movies/movie-image";
 import { cn } from "../../utils/cn";
 
 export function MovieDetailPage() {
-  const { movieId } = useParams({ from: "/movies/$movieId" });
-  const movie = movies.find((item) => item.id === Number(movieId));
-  const [rating, setRating] = useState(0);
+  const { movieId: movieIdParam } = useParams({ from: "/movies/$movieId" });
+  const movieId = Number(movieIdParam);
+  const isValidMovieId = Number.isInteger(movieId) && movieId > 0;
 
-  if (!movie) {
+  const movieDetailQuery = useQuery({
+    queryKey: ["movies", "detail", movieId],
+    queryFn: () => getMovieDetail(movieId),
+    enabled: isValidMovieId,
+  });
+
+  if (!isValidMovieId || movieDetailQuery.isPending || movieDetailQuery.isError) {
+    const message = !isValidMovieId
+      ? "올바르지 않은 영화 번호예요."
+      : movieDetailQuery.isPending
+        ? "불러오는 중이에요."
+        : getMovieDetailErrorMessage(movieDetailQuery.error);
+
     return (
       <main className="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-8 text-lg font-semibold">
-        영화를 찾을 수 없어요.
+        <p role={isValidMovieId && movieDetailQuery.isPending ? "status" : "alert"}>
+          {message}
+        </p>
       </main>
     );
   }
 
+  return <MovieDetailContent key={movieId} movie={movieDetailQuery.data} />;
+}
+
+function MovieDetailContent({ movie }: { movie: TmdbMovieDetail }) {
+  // 영화가 바뀌면 key가 바뀌어 이전 영화에 입력한 평점도 초기화돼요.
+  const [rating, setRating] = useState(0);
+
+  const runtime = movie.runtime === null ? "상영 시간 정보가 없어요."
+    : `${Math.floor(movie.runtime / 60)}시간 ${movie.runtime % 60}분`;
+
   return (
     <main className="flex-1 bg-[#f5f6f8]">
       <section className="relative h-[360px] overflow-hidden bg-slate-900 text-white">
-        <img
-          src={movie.backdropPath}
+        <MovieImage
+          src={getTmdbBackdropUrl(movie.backdrop_path)}
           alt=""
-          aria-hidden="true"
           className="absolute inset-0 h-full w-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/35 to-black/10" />
@@ -39,20 +67,20 @@ export function MovieDetailPage() {
               {movie.title}
             </h1>
             <p className="mt-4 text-sm font-medium text-white/90">
-              {movie.originalTitle}
+              {movie.original_title}
             </p>
             <p className="mt-2 text-sm font-semibold">
-              {movie.releaseDate}&nbsp;&nbsp; {movie.genres.join(" · ")}&nbsp;&nbsp; {movie.runtime}
+              {movie.release_date}&nbsp;&nbsp; {movie.genres.map((genre) => genre.name).join(", ")}&nbsp;&nbsp; {runtime}
             </p>
           </div>
         </div>
       </section>
 
       <section className="mx-auto grid w-full max-w-7xl gap-8 px-8 py-8 lg:grid-cols-[210px_minmax(0,1fr)_330px] lg:px-12">
-        <img
-          src={movie.posterPath}
+        <MovieImage
+          src={getTmdbPosterUrl(movie.poster_path)}
           alt={`${movie.title} 포스터`}
-          className="w-full max-w-[210px] rounded-xl object-cover shadow-xl"
+          className="aspect-[2/3] w-full max-w-[210px] rounded-xl object-cover shadow-xl"
         />
 
         <div className="min-w-0 pt-1">

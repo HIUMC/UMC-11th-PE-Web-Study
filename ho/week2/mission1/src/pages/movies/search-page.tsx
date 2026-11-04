@@ -1,7 +1,10 @@
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState, type SubmitEvent } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { BookmarkButton } from "../../components/bookmark-button";
-import { movies } from "../../data/movies";
+import { searchMovies } from "../../api/movies/search-movies";
+import { MovieImage } from "../../components/movies/movie-image";
+import { getTmdbPosterUrl } from "../../utils/movies/tmdb-image";
 import { cn } from "../../utils/cn";
 
 export function SearchPage() {
@@ -15,14 +18,15 @@ export function SearchPage() {
     setSearchText(query ?? "");
   }
 
-  const normalizedQuery = query?.trim().toLowerCase() ?? "";
-  const searchResults = normalizedQuery
-    ? movies.filter(
-        (movie) =>
-          movie.title.toLowerCase().includes(normalizedQuery) ||
-          movie.originalTitle.toLowerCase().includes(normalizedQuery),
-      )
-    : [];
+  const normalizedQuery = query?.trim() ?? "";
+  const searchQuery = useQuery({
+    queryKey: ["movies", "search", { query: normalizedQuery }],
+    queryFn: () => searchMovies({ query: normalizedQuery }),
+    enabled: normalizedQuery.length > 0,
+  });
+
+  const searchResults = searchQuery.data?.results ?? [];
+  const totalResults = searchQuery.data?.total_results ?? 0;
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -108,11 +112,15 @@ export function SearchPage() {
         <div className="flex items-center justify-between border-b border-slate-200 py-4">
           <h2 className="text-lg font-bold">‘{query}’ 검색 결과</h2>
           <p className="text-sm text-slate-400">
-            영화 {searchResults.length}편 · 1페이지
+            {searchQuery.isLoading ? "검색 중" : searchQuery.isError ? "검색 실패" : `영화 ${totalResults}편 · 1페이지`}
           </p>
         </div>
 
-        {searchResults.length === 0 ? (
+        {searchQuery.isLoading ? (
+          <p role="status" className="py-24 text-center text-slate-500">불러오는 중이에요.</p>
+        ) : searchQuery.isError ? (
+          <p role="alert" className="py-24 text-center text-slate-500">{searchQuery.error.message}</p>
+        ) : searchQuery.isSuccess && searchResults.length === 0 ? (
           <div className="flex min-h-72 items-center justify-center text-base font-medium text-slate-500">
             검색 결과가 없어요.
           </div>
@@ -132,8 +140,8 @@ export function SearchPage() {
                   })}
                   className="shrink-0"
                 >
-                  <img
-                    src={movie.posterPath}
+                  <MovieImage
+                    src={getTmdbPosterUrl(movie.poster_path)}
                     alt={`${movie.title} 포스터`}
                     className="h-44 w-28 rounded-lg object-cover shadow-sm"
                   />
@@ -144,7 +152,7 @@ export function SearchPage() {
                     <BookmarkButton movieId={movie.id} variant="search" />
                   </div>
                   <p className="mt-1 text-xs text-slate-400">
-                    {movie.originalTitle}&nbsp;&nbsp; {movie.releaseDate}
+                    {movie.original_title}&nbsp;&nbsp; {movie.release_date}
                   </p>
                   <p className="mt-4 line-clamp-2 text-sm leading-6 text-slate-600">
                     {movie.overview}

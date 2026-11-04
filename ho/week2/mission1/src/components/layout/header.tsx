@@ -4,6 +4,7 @@ import { cn } from "../../utils/cn";
 const navItems = [
   { label: "영화", to: "/" as const },
   { label: "검색", to: "/search" as const },
+  { label: "내 정보", to: "/my" as const },
 ];
 
 export function Header() {
@@ -45,9 +46,6 @@ export function Header() {
                   </li>
                 );
               })}
-              <li>
-                <span className="text-sm font-medium text-slate-500">내 정보</span>
-              </li>
             </ul>
           </nav>
         </div>

@@ -1,0 +1,210 @@
+{
+  "profile": "demo (H2 MySQL mode)",
+  "browserErrors": [],
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/members",
+      "status": 201,
+      "body": {
+        "isSuccess": true,
+        "code": "COMMON201",
+        "message": "회원가입에 성공했습니다.",
+        "result": {
+          "memberId": 4,
+          "email": "moviefan@umc.com",
+          "nickname": "영화친구"
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/members",
+      "status": 400,
+      "body": {
+        "isSuccess": false,
+        "code": "COMMON4001",
+        "message": "올바른 이메일 형식이 아닙니다.",
+        "result": null
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/members",
+      "status": 409,
+      "body": {
+        "isSuccess": false,
+        "code": "MEMBER4091",
+        "message": "이미 사용 중인 이메일입니다.",
+        "result": null
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/members/4/ratings",
+      "status": 201,
+      "body": {
+        "isSuccess": true,
+        "code": "COMMON201",
+        "message": "평점 등록에 성공했습니다.",
+        "result": 4
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/members/4/ratings",
+      "status": 200,
+      "body": {
+        "isSuccess": true,
+        "code": "COMMON200",
+        "message": "평점 조회에 성공했습니다.",
+        "result": [
+          {
+            "ratingId": 4,
+            "movieId": 550,
+            "score": 5,
+            "comment": "다시 보고 싶은 영화",
+            "createdAt": "2026-11-04T23:55:21.94466",
+            "updatedAt": "2026-11-04T23:55:21.94466"
+          }
+        ]
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/members/4/ratings/4",
+      "status": 200,
+      "body": {
+        "isSuccess": true,
+        "code": "COMMON200",
+        "message": "평점 수정에 성공했습니다.",
+        "result": null
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/members/4/ratings",
+      "status": 200,
+      "body": {
+        "isSuccess": true,
+        "code": "COMMON200",
+        "message": "평점 조회에 성공했습니다.",
+        "result": [
+          {
+            "ratingId": 4,
+            "movieId": 550,
+            "score": 4,
+            "comment": "두 번째 감상 후 수정한 후기",
+            "createdAt": "2026-11-04T23:55:21.94466",
+            "updatedAt": "2026-11-04T23:55:22.578249"
+          }
+        ]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/members/4/ratings",
+      "status": 409,
+      "body": {
+        "isSuccess": false,
+        "code": "RATING4091",
+        "message": "이미 이 영화에 평점을 남기셨습니다.",
+        "result": null
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/members/4/ratings",
+      "status": 400,
+      "body": {
+        "isSuccess": false,
+        "code": "COMMON4001",
+        "message": "별점은 5점 이하여야 합니다.",
+        "result": null
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/members/4/ratings/4",
+      "status": 204,
+      "body": null
+    },
+    {
+      "method": "GET",
+      "path": "/members/4/ratings",
+      "status": 200,
+      "body": {
+        "isSuccess": true,
+        "code": "COMMON200",
+        "message": "평점 조회에 성공했습니다.",
+        "result": []
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/members/2/ratings/4",
+      "status": 403,
+      "body": {
+        "isSuccess": false,
+        "code": "RATING4031",
+        "message": "본인이 작성한 평점만 수정하거나 삭제할 수 있습니다.",
+        "result": null
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/members/2/ratings/4",
+      "status": 403,
+      "body": {
+        "isSuccess": false,
+        "code": "RATING4031",
+        "message": "본인이 작성한 평점만 수정하거나 삭제할 수 있습니다.",
+        "result": null
+      }
+    },
+    {
+      "method": "PATCH",
+      "path": "/members/4/ratings/4",
+      "status": 404,
+      "body": {
+        "isSuccess": false,
+        "code": "RATING4041",
+        "message": "존재하지 않는 평점입니다.",
+        "result": null
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/members/4/ratings/4",
+      "status": 404,
+      "body": {
+        "isSuccess": false,
+        "code": "RATING4041",
+        "message": "존재하지 않는 평점입니다.",
+        "result": null
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/members/999999/ratings",
+      "status": 404,
+      "body": {
+        "isSuccess": false,
+        "code": "MEMBER4041",
+        "message": "존재하지 않는 회원입니다.",
+        "result": null
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/members",
+      "status": 409,
+      "body": {
+        "isSuccess": false,
+        "code": "MEMBER4092",
+        "message": "이미 사용 중인 닉네임입니다.",
+        "result": null
+      }
+    }
+  ]
+}

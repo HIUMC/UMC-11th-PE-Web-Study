@@ -1,0 +1,154 @@
+{
+  "runner": "Newman (Postman collection runner)",
+  "profile": "demo (H2 MySQL mode)",
+  "stats": {
+    "iterations": {
+      "total": 1,
+      "pending": 0,
+      "failed": 0
+    },
+    "items": {
+      "total": 20,
+      "pending": 0,
+      "failed": 0
+    },
+    "scripts": {
+      "total": 21,
+      "pending": 0,
+      "failed": 0
+    },
+    "prerequests": {
+      "total": 20,
+      "pending": 0,
+      "failed": 0
+    },
+    "requests": {
+      "total": 20,
+      "pending": 0,
+      "failed": 0
+    },
+    "tests": {
+      "total": 20,
+      "pending": 0,
+      "failed": 0
+    },
+    "assertions": {
+      "total": 71,
+      "pending": 0,
+      "failed": 0
+    },
+    "testScripts": {
+      "total": 20,
+      "pending": 0,
+      "failed": 0
+    },
+    "prerequestScripts": {
+      "total": 1,
+      "pending": 0,
+      "failed": 0
+    }
+  },
+  "failures": [],
+  "results": [
+    {
+      "name": "01 회원가입",
+      "status": 201,
+      "code": "COMMON201"
+    },
+    {
+      "name": "02 다른 회원 가입",
+      "status": 201,
+      "code": "COMMON201"
+    },
+    {
+      "name": "03 이메일 중복",
+      "status": 409,
+      "code": "MEMBER4091"
+    },
+    {
+      "name": "04 닉네임 중복",
+      "status": 409,
+      "code": "MEMBER4092"
+    },
+    {
+      "name": "05 이메일 형식 오류",
+      "status": 400,
+      "code": "COMMON4001"
+    },
+    {
+      "name": "06 평점 등록",
+      "status": 201,
+      "code": "COMMON201"
+    },
+    {
+      "name": "07 평점 중복",
+      "status": 409,
+      "code": "RATING4091"
+    },
+    {
+      "name": "08 별점 범위 오류",
+      "status": 400,
+      "code": "COMMON4001"
+    },
+    {
+      "name": "09 소수 별점 오류",
+      "status": 400,
+      "code": "COMMON4001"
+    },
+    {
+      "name": "10 평점 조회",
+      "status": 200,
+      "code": "COMMON200"
+    },
+    {
+      "name": "11 평점 수정",
+      "status": 200,
+      "code": "COMMON200"
+    },
+    {
+      "name": "12 다른 회원의 수정 요청",
+      "status": 403,
+      "code": "RATING4031"
+    },
+    {
+      "name": "13 다른 회원의 삭제 요청",
+      "status": 403,
+      "code": "RATING4031"
+    },
+    {
+      "name": "14 없는 평점 수정",
+      "status": 404,
+      "code": "RATING4041"
+    },
+    {
+      "name": "15 없는 평점 삭제",
+      "status": 404,
+      "code": "RATING4041"
+    },
+    {
+      "name": "16 평점 삭제",
+      "status": 204,
+      "code": null
+    },
+    {
+      "name": "17 삭제 후 조회",
+      "status": 200,
+      "code": "COMMON200"
+    },
+    {
+      "name": "18 없는 회원의 등록 요청",
+      "status": 404,
+      "code": "MEMBER4041"
+    },
+    {
+      "name": "19 닉네임 중복 확인",
+      "status": 200,
+      "code": "COMMON200"
+    },
+    {
+      "name": "20 이메일 중복 확인",
+      "status": 200,
+      "code": "COMMON200"
+    }
+  ]
+}

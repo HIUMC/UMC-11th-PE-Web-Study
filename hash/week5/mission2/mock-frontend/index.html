@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CORS 확인</title>
+</head>
+<body>
+<h1>닉네임 중복 확인</h1>
+<button id="check" type="button">수현 조회</button>
+<pre id="result">버튼을 눌러 주세요.</pre>
+
+<script>
+    const button = document.querySelector("#check");
+    const result = document.querySelector("#result");
+
+    button.addEventListener("click", async () => {
+        button.disabled = true;
+        result.textContent = "조회 중…";
+
+        try {
+            const nickname = encodeURIComponent("수현");
+            const response = await fetch(
+                `http://localhost:8080/members/nickname/${nickname}`
+            );
+            const data = await response.json();
+
+            result.textContent =
+                `HTTP ${response.status}\n${JSON.stringify(data, null, 2)}`;
+        } catch (error) {
+            result.textContent =
+                "응답을 읽지 못했습니다. Console의 오류를 확인하세요.";
+            console.error(error);
+        } finally {
+            button.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>

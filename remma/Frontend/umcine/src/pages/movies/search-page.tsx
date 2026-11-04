@@ -1,54 +1,23 @@
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useEffect, useState, type SubmitEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import { searchMovies } from "../../api/movies/search-movies";
-import type { TmdbMovieListItem } from "../../api/movies/models";
 import { getTmdbPosterUrl } from "../../utils/movies/tmdb-image";
 import { BookmarkButton } from "../../components/bookmark-button";
+import { useQuery } from "@tanstack/react-query";
 
 export function SearchPage() {
   const { query = "" } = useSearch({ from: "/search" });
   const navigate = useNavigate({ from: "/search" });
   const [searchText, setSearchText] = useState(query);
+  const normalizedQuery = query.trim();
 
-  const [movies, setMovies] = useState<TmdbMovieListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const searchQuery = useQuery({
+    queryKey: ["movies", "search", { query: normalizedQuery }],
+    queryFn: () => searchMovies({ query: normalizedQuery }),
+    enabled: normalizedQuery.length > 0,
+  });
 
-  // 1. 첫 번째 useEffect 대신 query가 바뀔 때 상태를 맞추거나 아래처럼 수정
-  useEffect(() => {
-    let ignore = false;
-    const normalizedQuery = query.trim();
-
-    if (!normalizedQuery) {
-      return;
-    }
-
-    // 비동기 흐름 안에서 상태 업데이트
-    Promise.resolve().then(() => {
-      if (!ignore) {
-        setIsLoading(true);
-        setErrorMessage(null);
-      }
-    });
-
-    searchMovies({ query: normalizedQuery })
-      .then((response) => {
-        if (!ignore) setMovies(response.results);
-      })
-      .catch(() => {
-        if (!ignore) {
-          setMovies([]);
-          setErrorMessage("검색 결과를 불러오지 못했어요.");
-        }
-      })
-      .finally(() => {
-        if (!ignore) setIsLoading(false);
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, [query]);
+  const searchResults = searchQuery.data?.results ?? [];
 
   function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -57,8 +26,6 @@ export function SearchPage() {
       search: nextQuery ? { query: nextQuery } : {},
     });
   }
-
-  const normalizedQuery = query.trim();
 
   return (
     <main className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
@@ -111,28 +78,28 @@ export function SearchPage() {
           </form>
 
           {/* 2. 로딩 → 3. 오류 → 4. 빈 결과 → 5. 성공 순서로 표시 */}
-          {isLoading ? (
+          {searchQuery.isLoading ? (
             <p className="py-20 text-center text-gray-500">
               검색 결과를 불러오는 중이에요.
             </p>
-          ) : errorMessage ? (
-            <p className="py-20 text-center text-red-600">{errorMessage}</p>
+          ) : searchQuery.isError ? (
+            <p className="py-20 text-center text-red-600">검색 결과를 불러오지 못했어요.</p>
           ) : (
             <>
               <h2 className="text-xl font-extrabold text-gray-950">
                 ‘{query}’ 검색 결과
               </h2>
               <p className="mt-1 mb-6 text-xs text-gray-500">
-                영화 {movies.length}편
+                영화 {searchResults.length}편
               </p>
 
-              {movies.length === 0 ? (
+              {searchResults.length === 0 ? (
                 <p className="py-24 text-center text-sm text-gray-500">
                   검색 결과가 없어요.
                 </p>
               ) : (
                 <ul className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                  {movies.map((movie) => {
+                  {searchResults.map((movie) => {
                     const posterUrl = getTmdbPosterUrl(movie.poster_path);
                     return (
                       <li

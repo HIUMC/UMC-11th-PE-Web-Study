@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useParams } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { getMovieDetail } from "../../api/movies/get-movie-detail";
-import type { TmdbMovieDetail } from "../../api/movies/models";
 import { getMovieDetailErrorMessage } from "../../utils/movies/get-movie-detail-error-message";
 import {
   getTmdbBackdropUrl,
@@ -27,10 +27,6 @@ export function MovieDetailPage() {
   const isValidMovieId =
     Number.isInteger(parsedMovieId) && parsedMovieId > 0;
 
-  const [movie, setMovie] = useState<TmdbMovieDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
   const [rating, setRating] = useState(4);
   const [review, setReview] = useState("");
 
@@ -40,39 +36,12 @@ export function MovieDetailPage() {
   );
   const toggleBookmark = useBookmarkStore((state) => state.toggleBookmark);
 
-  useEffect(() => {
-    let ignore = false;
-
-    async function loadMovieDetail() {
-      if (!isValidMovieId) {
-        return;
-      }
-
-      await Promise.resolve();
-      if (ignore) return;
-
-      setIsLoading(true);
-      setErrorMessage(null);
-
-      try {
-        const response = await getMovieDetail(parsedMovieId);
-        if (!ignore) setMovie(response);
-      } catch (error) {
-        if (!ignore) {
-          setMovie(null);
-          setErrorMessage(getMovieDetailErrorMessage(error));
-        }
-      } finally {
-        if (!ignore) setIsLoading(false);
-      }
-    }
-
-    loadMovieDetail();
-
-    return () => {
-      ignore = true;
-    };
-  }, [parsedMovieId, isValidMovieId]);
+  const movieDetailQuery = useQuery({
+    queryKey: ["movies", "detail", { movieId: parsedMovieId }],
+    queryFn: () => getMovieDetail(parsedMovieId),
+    enabled: isValidMovieId,
+    staleTime: 30 * 1000, // [미니 실습] 30초 동안 캐시 유지
+  });
 
   // 1. 유효하지 않은 영화 ID 처리 (예: /movies/abc, /movies/-1)
   if (!isValidMovieId) {
@@ -92,7 +61,7 @@ export function MovieDetailPage() {
   }
 
   // 2. 로딩 상태
-  if (isLoading) {
+  if (movieDetailQuery.isPending) {
     return (
       <main className="flex min-h-[60vh] items-center justify-center">
         <p className="text-gray-500">영화 정보를 불러오는 중이에요.</p>
@@ -101,12 +70,11 @@ export function MovieDetailPage() {
   }
 
   // 3. 오류 상태 (404: 영화를 찾을 수 없어요. / 기타: 영화 정보를 불러오지 못했어요.)
-  if (errorMessage || !movie) {
+  if (movieDetailQuery.isError) {
+    const errorMessage = getMovieDetailErrorMessage(movieDetailQuery.error);
     return (
       <main className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
-        <p className="text-xl font-bold text-gray-900">
-          {errorMessage ?? "영화를 찾을 수 없어요."}
-        </p>
+        <p className="text-xl font-bold text-gray-900">{errorMessage}</p>
         <Link
           to="/"
           className="text-sm font-semibold text-blue-600 hover:underline"
@@ -117,6 +85,7 @@ export function MovieDetailPage() {
     );
   }
 
+  const movie = movieDetailQuery.data;
   const backdropUrl = getTmdbBackdropUrl(movie.backdrop_path);
   const posterUrl = getTmdbPosterUrl(movie.poster_path);
   const genreText = movie.genres.map((genre) => genre.name).join(", ");

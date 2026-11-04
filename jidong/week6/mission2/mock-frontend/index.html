@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UMCine API 테스트</title>
+    <style>
+      body { font-family: system-ui, sans-serif; background: #f5f6f8; margin: 0; padding: 32px; color: #111; }
+      main { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+      h1 { font-size: 22px; margin: 0; }
+      section { background: #fff; border: 1px solid #e3e5e8; border-radius: 10px; padding: 20px; }
+      h2 { font-size: 16px; margin: 0 0 4px; }
+      .endpoint { font-size: 12px; color: #888; margin: 0 0 12px; font-family: monospace; }
+      form { display: flex; gap: 8px; }
+      input { flex: 1; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+      button { padding: 8px 16px; border: 0; border-radius: 6px; background: #2563eb; color: #fff; font-size: 14px; cursor: pointer; }
+      .result { margin-top: 12px; font-size: 14px; }
+      .ok { color: #15803d; font-weight: 600; }
+      .no { color: #dc2626; font-weight: 600; }
+      .error { color: #dc2626; }
+      pre { background: #f3f4f6; border-radius: 6px; padding: 10px; font-size: 12px; overflow-x: auto; margin: 8px 0 0; }
+      ul { padding: 0; margin: 8px 0 0; list-style: none; display: flex; flex-direction: column; gap: 8px; }
+      li { border: 1px solid #eee; border-radius: 6px; padding: 10px; font-size: 14px; }
+      .score { color: #f59e0b; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>UMCine 백엔드 API 테스트</h1>
+
+      <section>
+        <h2>닉네임 중복 체크</h2>
+        <p class="endpoint">GET /members/nickname/{nickname}</p>
+        <form id="nickname-form">
+          <input id="nickname-input" value="수현" placeholder="닉네임" />
+          <button type="submit">확인</button>
+        </form>
+        <div id="nickname-result" class="result"></div>
+      </section>
+
+      <section>
+        <h2>이메일 중복 체크</h2>
+        <p class="endpoint">GET /members/email/{email}</p>
+        <form id="email-form">
+          <input id="email-input" value="noco@umc.com" placeholder="이메일" />
+          <button type="submit">확인</button>
+        </form>
+        <div id="email-result" class="result"></div>
+      </section>
+
+      <section>
+        <h2>유저별 평점 조회</h2>
+        <p class="endpoint">GET /members/{memberId}/ratings</p>
+        <form id="ratings-form">
+          <input id="member-id-input" type="number" min="1" value="1" placeholder="회원 번호" />
+          <button type="submit">조회</button>
+        </form>
+        <div id="ratings-result" class="result"></div>
+      </section>
+    </main>
+
+    <script>
+      const API_BASE_URL = "http://localhost:8080";
+
+      async function request(path) {
+        const response = await fetch(`${API_BASE_URL}${path}`);
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || `요청 실패 (${response.status})`);
+        }
+        return data;
+      }
+
+      function showError(target, error) {
+        console.error(error);
+        // CORS로 막히면 fetch가 TypeError(Failed to fetch)를 던집니다.
+        const message =
+          error instanceof TypeError
+            ? "응답을 받지 못했어요. 서버 실행 여부와 CORS 설정을 확인하세요. (Console 확인)"
+            : error.message;
+        target.innerHTML = `<p class="error">${message}</p>`;
+      }
+
+      function showAvailability(target, data, label) {
+        target.innerHTML = `
+          <p class="${data.available ? "ok" : "no"}">
+            ${data.available ? `사용 가능한 ${label}이에요.` : `이미 사용 중인 ${label}이에요.`}
+          </p>
+          <pre>${JSON.stringify(data, null, 2)}</pre>`;
+      }
+
+      document.getElementById("nickname-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const target = document.getElementById("nickname-result");
+        const nickname = document.getElementById("nickname-input").value.trim();
+        if (!nickname) return;
+        try {
+          const data = await request(`/members/nickname/${encodeURIComponent(nickname)}`);
+          showAvailability(target, data, "닉네임");
+        } catch (error) {
+          showError(target, error);
+        }
+      });
+
+      document.getElementById("email-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const target = document.getElementById("email-result");
+        const email = document.getElementById("email-input").value.trim();
+        if (!email) return;
+        try {
+          const data = await request(`/members/email/${encodeURIComponent(email)}`);
+          showAvailability(target, data, "이메일");
+        } catch (error) {
+          showError(target, error);
+        }
+      });
+
+      document.getElementById("ratings-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const target = document.getElementById("ratings-result");
+        const memberId = document.getElementById("member-id-input").value;
+        try {
+          const ratings = await request(`/members/${memberId}/ratings`);
+          if (ratings.length === 0) {
+            target.innerHTML = `<p>아직 남긴 평점이 없어요.</p>`;
+            return;
+          }
+          target.innerHTML = `
+            <p>평점 ${ratings.length}개</p>
+            <ul>
+              ${ratings
+                .map(
+                  (rating) => `
+                <li>
+                  <strong>영화 #${rating.movieId}</strong>
+                  <span class="score">${"★".repeat(rating.score)}${"☆".repeat(5 - rating.score)}</span>
+                  <div>${rating.comment ?? ""}</div>
+                </li>`,
+                )
+                .join("")}
+            </ul>
+            <pre>${JSON.stringify(ratings, null, 2)}</pre>`;
+        } catch (error) {
+          showError(target, error);
+        }
+      });
+    </script>
+  </body>
+</html>

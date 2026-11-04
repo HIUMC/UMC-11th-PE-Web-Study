@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f6f5f0">
+  <meta name="description" content="UMC Movie의 회원 중복 확인과 별점 조회 API를 직접 연결한 웹 화면">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232d443b'/%3E%3Ctext x='15' y='46' font-size='42' fill='%23fff'%3EU%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/styles.css">
+  <script type="module" src="/app.js"></script>
+  <title>UMC Cinema · 나의 영화 기록</title>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="UMC Cinema 홈"><span class="brand-icon">u.</span> UMC <span class="brand-light">CINEMA</span></a>
+    <span class="top-label">WEEK 05 <span class="divider">/</span> API CONNECTION</span>
+    <span class="local-badge"><span class="dot"></span> LOCAL WORKSPACE</span>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">YOUR OWN CINEMA JOURNAL</p>
+        <h1 id="page-title">영화를 보고,<br>나만의 기록을 남기다<span class="accent">.</span></h1>
+        <p class="intro">나를 위한 닉네임부터 취향이 담긴 별점까지.<br>회원 정보를 확인하고, 나의 영화 기록을 불러오세요.</p>
+      </div>
+      <aside class="connection-card">
+        <div class="connection-top"><span>API 연결 현황</span><span class="small-label">LIVE RESPONSE</span></div>
+        <div class="connection-count"><strong id="success-count">0</strong><span>/ 4</span><p>정상 응답을 받은 API</p></div>
+        <div class="progress"><span id="progress-bar"></span></div>
+        <div class="connection-bottom"><span id="connection-summary" role="status">아래에서 API를 호출해 보세요</span><button id="run-all" class="text-button" type="button">전체 호출 <span aria-hidden="true">↗</span></button></div>
+      </aside>
+    </section>
+
+    <section class="workspace" aria-labelledby="workspace-title">
+      <div class="section-heading"><h2 id="workspace-title">마이 시네마 <span>My cinema</span></h2><span class="section-note">01 — 04 / 모든 API 연결</span></div>
+      <div class="cards">
+        <article class="api-card" id="nickname-card">
+          <div class="card-heading"><span class="card-number">01 / PROFILE</span><span class="status-badge" id="nickname-badge">호출 전</span></div>
+          <h3>어떤 이름으로 기록할까요?</h3>
+          <p class="card-description">사용하고 싶은 닉네임이 있는지 확인하세요.</p>
+          <form id="nickname-form">
+            <label for="nickname">닉네임</label>
+            <div class="input-row"><input id="nickname" name="nickname" value="umc_cinema" placeholder="닉네임을 입력하세요" required maxlength="100" autocomplete="off"><button class="primary-button" type="submit">중복 확인</button></div>
+          </form>
+          <div class="result" id="nickname-result" role="status">닉네임을 입력하고 중복 확인을 눌러주세요.</div>
+          <div class="response-panel"><div class="response-heading"><span><b>GET</b> 닉네임 중복 확인</span><span id="nickname-meta">READY</span></div><code class="request-path" id="nickname-path">/members/nickname/{nickname}</code><pre id="nickname-json">아직 요청하지 않았습니다.</pre><time id="nickname-time"></time></div>
+        </article>
+
+        <article class="api-card" id="email-card">
+          <div class="card-heading"><span class="card-number">02 / ACCOUNT</span><span class="status-badge" id="email-badge">호출 전</span></div>
+          <h3>이메일을 확인해 주세요.</h3>
+          <p class="card-description">이미 등록된 이메일인지 확인할 수 있어요.</p>
+          <form id="email-form">
+            <label for="email">이메일 주소</label>
+            <div class="input-row"><input id="email" name="email" type="email" value="cinema@example.com" placeholder="you@example.com" required autocomplete="off"><button class="primary-button" type="submit">중복 확인</button></div>
+          </form>
+          <div class="result" id="email-result" role="status">이메일을 입력하고 중복 확인을 눌러주세요.</div>
+          <div class="response-panel"><div class="response-heading"><span><b>GET</b> 이메일 중복 확인</span><span id="email-meta">READY</span></div><code class="request-path" id="email-path">/members/email/{email}</code><pre id="email-json">아직 요청하지 않았습니다.</pre><time id="email-time"></time></div>
+        </article>
+
+        <article class="api-card" id="check-card">
+          <div class="card-heading"><span class="card-number">03 / MEMBER CHECK</span><span class="status-badge" id="check-badge">호출 전</span></div>
+          <h3>회원 정보가 일치하나요?</h3>
+          <p class="card-description">닉네임과 이메일이 같은 회원의 정보인지 확인하세요.</p>
+          <form id="check-form">
+            <label for="check">확인할 닉네임</label>
+            <input id="check" name="nickname" value="umc_cinema" required maxlength="50" autocomplete="off">
+            <label for="check-email" class="second-label">확인할 이메일</label>
+            <div class="input-row"><input id="check-email" name="email" type="email" value="cinema@example.com" required maxlength="254" autocomplete="off"><button class="primary-button" type="submit">일치 확인</button></div>
+          </form>
+          <div class="result" id="check-result" role="status">닉네임과 이메일을 입력하고 일치 확인을 눌러주세요.</div>
+          <div class="response-panel"><div class="response-heading"><span><b>POST</b> 회원 정보 일치 확인</span><span id="check-meta">READY</span></div><code class="request-path" id="check-path">/members/check</code><pre id="check-json">아직 요청하지 않았습니다.</pre><time id="check-time"></time></div>
+        </article>
+
+        <article class="api-card ratings-card" id="ratings-card">
+          <div class="card-heading"><span class="card-number">04 / MY RATINGS</span><span class="status-badge" id="ratings-badge">호출 전</span></div>
+          <h3>별점에 담긴 나의 취향.</h3>
+          <p class="card-description">회원 번호로 지금까지 남긴 영화 기록을 만나보세요.</p>
+          <form id="ratings-form">
+            <label for="ratings">회원 번호</label>
+            <div class="input-row"><input id="ratings" name="memberId" type="text" inputmode="numeric" pattern="[1-9][0-9]*" value="1" placeholder="예: 1" required maxlength="19" autocomplete="off"><button class="primary-button" type="submit">별점 조회 <span aria-hidden="true">↗</span></button></div>
+          </form>
+          <div class="result" id="ratings-result" role="status">회원 번호를 입력하면 별점 목록을 불러옵니다.</div>
+          <div id="rating-list" class="rating-list"></div>
+          <div class="response-panel"><div class="response-heading"><span><b>GET</b> 회원별 별점 조회</span><span id="ratings-meta">READY</span></div><code class="request-path" id="ratings-path">/members/{memberId}/ratings</code><pre id="ratings-json">아직 요청하지 않았습니다.</pre><time id="ratings-time"></time></div>
+        </article>
+      </div>
+    </section>
+    <footer><span><span class="dot"></span> <strong>프론트엔드</strong> <code>localhost:5173</code> <span class="arrow">→</span> <strong>API 서버</strong> <code>localhost:8080</code></span><span>직접 연결 · CORS 허용 출처 사용</span></footer>
+  </main>
+</body>
+</html>

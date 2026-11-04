@@ -1,0 +1,30 @@
+package com.umc.movie.controller;
+
+import com.umc.movie.dto.RatingResponse;
+import com.umc.movie.service.RatingService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/members")
+public class RatingController {
+
+    private final RatingService ratingService;
+
+    @GetMapping("/{memberId}/ratings")
+    public Page<RatingResponse> getMemberRatings(
+            @PathVariable Long memberId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        // 회원 ID와 페이지 정보를 서비스에 전달
+        //해당 회원이 작성한 별점/코멘트 목록을 size 개수 따라서 보여줌
+        return ratingService.getRatingsByMember(memberId, page, size);
+    }
+}

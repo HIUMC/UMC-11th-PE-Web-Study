@@ -7,6 +7,10 @@ type PaginationProps = {
 const iconBase = "/icons/movie-icons/movie-icons";
 
 export default function Pagination({ currentPage, totalPages, onPageChange }: PaginationProps) {
+  const firstPage = Math.max(1, Math.min(currentPage - 2, totalPages - 4));
+  const visiblePageCount = Math.min(5, totalPages);
+  const visiblePages = Array.from({ length: visiblePageCount }, (_, index) => firstPage + index);
+
   return (
     <nav aria-label="영화 목록 페이지" className="mt-8 flex items-center justify-center gap-2">
       <button
@@ -18,7 +22,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }: Pa
       >
         <img src={`${iconBase}/chevron-left.svg`} alt="" className="h-5 w-5" />
       </button>
-      {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+      {visiblePages.map((page) => (
         <button
           key={page}
           type="button"

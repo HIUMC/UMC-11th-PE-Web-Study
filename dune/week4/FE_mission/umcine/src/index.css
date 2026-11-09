@@ -1,0 +1,299 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: #171717;
+}
+
+/* Header */
+
+.header {
+  height: 88px;
+  background: white;
+  border-bottom: 1px solid #eee;
+}
+
+.header-inner {
+  max-width: 1280px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.logo {
+  font-size: 20px;
+}
+
+.nav {
+  display: flex;
+  gap: 28px;
+}
+
+.nav a {
+  color: #222;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.search-button {
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+}
+
+.login-button {
+  height: 38px;
+  padding: 0 18px;
+
+  border: 0;
+  border-radius: 6px;
+
+  color: white;
+  background: #2563eb;
+}
+
+/* 영화 목록 */
+
+.main {
+  min-height: calc(100vh - 148px);
+
+  padding: 30px 24px 100px;
+
+  background: #f5f6f8;
+}
+
+.main > h1,
+.movie-grid {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.main h1 {
+  margin-top: 0;
+  margin-bottom: 24px;
+
+  font-size: 32px;
+}
+
+/* 5열 */
+
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+
+  gap: 24px 20px;
+}
+
+/* 카드 */
+
+.poster-wrapper {
+  position: relative;
+}
+
+.movie-poster {
+  display: block;
+
+  width: 100%;
+  aspect-ratio: 0.88;
+
+  object-fit: cover;
+
+  border-radius: 8px;
+}
+
+.bookmark-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  width: 32px;
+  height: 32px;
+
+  padding: 0;
+  border: 0;
+
+  background: transparent;
+  cursor: pointer;
+}
+
+.bookmark-button img {
+  width: 100%;
+  height: 100%;
+}
+
+.movie-card h3 {
+  margin: 10px 0 4px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.movie-card p {
+  margin: 0;
+
+  color: #888;
+  font-size: 11px;
+}
+
+/* footer */
+
+.footer {
+  height: 60px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  padding: 0 40px;
+
+  color: #999;
+  font-size: 10px;
+
+  background: white;
+}
+
+.movie-card a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.nav span {
+  color: #222;
+  font-size: 14px;
+}
+
+.header-right .search-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-content {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.search-form {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.search-form input {
+  width: min(400px, 100%);
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.search-form button,
+.bookmark-text-button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+.bookmark-text-button[aria-pressed="true"] {
+  background: #374151;
+}
+
+.search-results {
+  display: grid;
+  gap: 24px;
+  padding: 0;
+  list-style: none;
+}
+
+.search-result {
+  display: flex;
+  gap: 20px;
+}
+
+.search-result > a {
+  flex-shrink: 0;
+}
+
+.search-result img {
+  width: 120px;
+  border-radius: 8px;
+}
+
+.search-result h3 {
+  margin-top: 0;
+}
+
+.search-result a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.detail-backdrop {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  object-fit: cover;
+  margin: 20px 0;
+  border-radius: 12px;
+}
+
+.detail-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.detail-poster {
+  width: 240px;
+  border-radius: 8px;
+}
+
+.detail-content h1 {
+  margin-top: 0;
+}
+
+@media (max-width: 768px) {
+  .movie-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .detail-content {
+    flex-direction: column;
+  }
+
+  .header-left {
+    gap: 16px;
+  }
+
+  .nav {
+    gap: 12px;
+  }
+}

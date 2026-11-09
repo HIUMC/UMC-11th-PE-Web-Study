@@ -1,0 +1,131 @@
+{
+  "info": {
+    "name": "UMC 4주차 도서 API",
+    "description": "ORM 기반 GET /books와 POST /books 미션 검증 요청 모음",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "categoryId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. 도서 전체 조회 - 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('200 OK', function () {",
+              "  pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/books"
+      }
+    },
+    {
+      "name": "2. 도서 등록 성공 - 201",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('201 Created', function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "pm.test('응답에 도서 ID와 카테고리 이름이 있다', function () {",
+              "  const body = pm.response.json();",
+              "  pm.expect(body.bookId).to.be.a('number');",
+              "  pm.expect(body.categoryName).to.be.a('string');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"categoryId\": {{categoryId}},\n  \"title\": \"스프링 데이터 JPA\",\n  \"description\": \"ORM 기반 도서 등록\"\n}"
+        },
+        "url": "{{baseUrl}}/books"
+      }
+    },
+    {
+      "name": "3. 빈 제목 검증 - 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('400 Bad Request', function () {",
+              "  pm.response.to.have.status(400);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"categoryId\": {{categoryId}},\n  \"title\": \"   \",\n  \"description\": \"잘못된 요청\"\n}"
+        },
+        "url": "{{baseUrl}}/books"
+      }
+    },
+    {
+      "name": "4. 없는 카테고리 - 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('404 Not Found', function () {",
+              "  pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"categoryId\": 999999,\n  \"title\": \"존재할 수 없는 도서\",\n  \"description\": \"없는 카테고리\"\n}"
+        },
+        "url": "{{baseUrl}}/books"
+      }
+    }
+  ]
+}

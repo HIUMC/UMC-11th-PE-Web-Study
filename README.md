@@ -53,7 +53,7 @@ git remote add origin 레포지토리주소
 예시
 
 ```bash
-git remote add origin https://github.com/HIUMC/UMC-11th-PE-Web-Study.git
+git remote add origin https://github.com/HIUMC/UMC-11th-PE-Mobile-Study.git
 ```
 
 <br />
@@ -181,7 +181,7 @@ GitHub에서 **Compare & Pull Request** 버튼을 클릭합니다.
 
 ```
 1주차 미션을 진행했습니다.
-웹 기초 개념을 공부하고 간단한 기능을 구현했습니다.
+모바일 기초 개념을 공부하고 간단한 기능을 구현했습니다.
 ```
 ※ Title은 양식을 지켜주시고, description은 각자 공부한 내용이나 미션 진행 내용을 자유로운 양식으로 간단히 적어주시면 됩니다.
 

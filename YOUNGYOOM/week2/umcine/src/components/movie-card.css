@@ -1,0 +1,63 @@
+.card_container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.poster {
+  position: relative;
+  width: 241.6px;
+  height: 274px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.bookmark_button {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid white;
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.bookmark_button.active {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+}
+.bookmark {
+  width: 16px;
+  height: 16px;
+}
+
+.information {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+.card_container h6 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.card_container p {
+  font-size: 14px;
+  color: #9ca3af;
+  margin: 0;
+}

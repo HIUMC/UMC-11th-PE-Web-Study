@@ -1,0 +1,18 @@
+{
+  "name": "week5-front",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@tanstack/react-query": "^5.105.1"
+  },
+  "devDependencies": {
+    "@tanstack/react-query-devtools": "^5.105.1"
+  }
+}

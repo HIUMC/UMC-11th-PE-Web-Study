@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #fff;
+  color: #171717;
+}
+
+html {
+  scrollbar-gutter: stable;
+}

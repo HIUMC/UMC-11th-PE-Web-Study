@@ -1,20 +1,27 @@
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import BookmarkButton from "../../components/bookmark-button";
-import { movies } from "../../data/movies";
+import { searchMovies } from "../../api/movies/search-movies";
+import { getTmdbPosterUrl } from "../../utils/movies/tmdb-image";
 
 export function SearchPage() {
   const { query } = useSearch({ from: "/search" });
+
+  return <SearchResults key={query ?? ""} query={query ?? ""} />;
+}
+
+function SearchResults({ query }: { query: string }) {
   const navigate = useNavigate({ from: "/search" });
+  const normalizedQuery = query.trim();
 
-  const normalizedQuery = query?.trim().toLowerCase() ?? "";
+  const searchQuery = useQuery({
+    queryKey: ["movies", "search", { query: normalizedQuery }],
+    queryFn: () => searchMovies({ query: normalizedQuery }),
+    enabled: normalizedQuery.length > 0,
+  });
 
-  const searchResults = normalizedQuery
-    ? movies.filter(
-        (movie) =>
-          movie.title.toLowerCase().includes(normalizedQuery) ||
-          movie.originalTitle.toLowerCase().includes(normalizedQuery),
-      )
-    : [];
+  const movies = searchQuery.data?.results ?? [];
+  const totalResults = searchQuery.data?.total_results ?? 0;
 
   return (
     <main className="main">
@@ -35,11 +42,10 @@ export function SearchPage() {
           }}
         >
           <input
-            key={query ?? ""}
             name="query"
             aria-label="검색어"
             placeholder="영화 제목을 입력하세요"
-            defaultValue={query ?? ""}
+            defaultValue={query}
           />
           <button type="submit">검색</button>
         </form>
@@ -49,43 +55,64 @@ export function SearchPage() {
         ) : (
           <>
             <h2>‘{query}’ 검색 결과</h2>
-            <p>영화 {searchResults.length}편</p>
 
-            {searchResults.length === 0 ? (
+            {searchQuery.isLoading ? (
+              <p role="status">검색 결과를 불러오는 중이에요.</p>
+            ) : searchQuery.isError ? (
+              <p role="alert">검색 결과를 불러오지 못했어요.</p>
+            ) : searchQuery.isSuccess && movies.length === 0 ? (
               <p>검색 결과가 없어요.</p>
-            ) : (
-              <ul className="search-results">
-                {searchResults.map((movie) => (
-                  <li key={movie.id} className="search-result">
-                    <Link
-                      to="/movies/$movieId"
-                      params={{ movieId: String(movie.id) }}
-                    >
-                      <img
-                        src={movie.posterPath}
-                        alt={`${movie.title} 포스터`}
-                      />
-                    </Link>
+            ) : searchQuery.isSuccess ? (
+              <>
+                <p>
+                  영화 {totalResults}편 · 현재 {movies.length}편 표시
+                </p>
 
-                    <div>
-                      <h3>
+                <ul className="search-results">
+                  {movies.map((movie) => {
+                    const posterUrl = getTmdbPosterUrl(movie.poster_path);
+
+                    return (
+                      <li key={movie.id} className="search-result">
                         <Link
                           to="/movies/$movieId"
                           params={{ movieId: String(movie.id) }}
                         >
-                          {movie.title}
+                          {posterUrl ? (
+                            <img
+                              className="search-poster"
+                              src={posterUrl}
+                              alt={`${movie.title} 포스터`}
+                            />
+                          ) : (
+                            <div className="search-poster image-placeholder">
+                              이미지 없음
+                            </div>
+                          )}
                         </Link>
-                      </h3>
 
-                      <p>{movie.originalTitle}</p>
-                      <p>{movie.releaseDate}</p>
-                      <p>{movie.overview}</p>
-                      <BookmarkButton movieId={movie.id} />
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
+                        <div>
+                          <h3>
+                            <Link
+                              to="/movies/$movieId"
+                              params={{ movieId: String(movie.id) }}
+                            >
+                              {movie.title}
+                            </Link>
+                          </h3>
+
+                          <p>{movie.original_title}</p>
+                          <p>{movie.release_date}</p>
+                          <p>{movie.overview}</p>
+
+                          <BookmarkButton movieId={movie.id} />
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            ) : null}
           </>
         )}
       </div>

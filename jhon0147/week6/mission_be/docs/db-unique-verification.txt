@@ -1,0 +1,11 @@
+H2 MySQL mode / SignUpConcurrencyIntegrationTest
+2 test cases passed: email and nickname
+Each case: 4 concurrent requests, 1 created, 3 conflicts, 1 stored row.
+
+Actual DB error output:
+2026-11-04T23:50:48.058+09:00 ERROR 15164 --- [umc-movie] [pool-2-thread-2] o.h.engine.jdbc.spi.SqlExceptionHelper   : Unique index or primary key violation: "public.uk_member_email_INDEX_B ON public.member(email NULLS FIRST) VALUES ( /* 1 */ 'race@umc.com' )"; SQL statement:
+2026-11-04T23:50:48.058+09:00 ERROR 15164 --- [umc-movie] [pool-2-thread-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : Unique index or primary key violation: "public.uk_member_email_INDEX_B ON public.member(email NULLS FIRST) VALUES ( /* 1 */ 'race@umc.com' )"; SQL statement:
+2026-11-04T23:50:48.058+09:00 ERROR 15164 --- [umc-movie] [pool-2-thread-3] o.h.engine.jdbc.spi.SqlExceptionHelper   : Unique index or primary key violation: "public.uk_member_email_INDEX_B ON public.member(email NULLS FIRST) VALUES ( /* 1 */ 'race@umc.com' )"; SQL statement:
+2026-11-04T23:50:48.215+09:00 ERROR 15164 --- [umc-movie] [pool-3-thread-3] o.h.engine.jdbc.spi.SqlExceptionHelper   : Unique index or primary key violation: "public.uk_member_nickname_INDEX_B ON public.member(nickname NULLS FIRST) VALUES ( /* 6 */ U&'\\ac19\\c740\\b2c9\\b124\\c784' )"; SQL statement:
+2026-11-04T23:50:48.215+09:00 ERROR 15164 --- [umc-movie] [pool-3-thread-1] o.h.engine.jdbc.spi.SqlExceptionHelper   : Unique index or primary key violation: "public.uk_member_nickname_INDEX_B ON public.member(nickname NULLS FIRST) VALUES ( /* 6 */ U&'\\ac19\\c740\\b2c9\\b124\\c784' )"; SQL statement:
+2026-11-04T23:50:48.222+09:00 ERROR 15164 --- [umc-movie] [pool-3-thread-4] o.h.engine.jdbc.spi.SqlExceptionHelper   : Unique index or primary key violation: "public.uk_member_nickname_INDEX_B ON public.member(nickname NULLS FIRST) VALUES ( /* 6 */ U&'\\ac19\\c740\\b2c9\\b124\\c784' )"; SQL statement:

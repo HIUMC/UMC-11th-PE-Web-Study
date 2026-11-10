@@ -1,0 +1,54 @@
+// src/main/java/com/umc/movie/config/WebConfig.java
+package com.umc.movie.config;
+
+import com.umc.movie.interceptor.AuthInterceptor;
+import com.umc.movie.resolver.LoginMemberArgumentResolver;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
+
+@Configuration
+@RequiredArgsConstructor   // 이미 없다면 추가
+public class WebConfig implements WebMvcConfigurer {
+
+    private final AuthInterceptor authInterceptor;   // 추가
+
+    // 5주차에서 작성한 CORS 설정입니다. 본인이 설정한 값을 그대로 두세요.
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:5173")
+                .allowedMethods("GET", "POST", "PATCH", "DELETE", "OPTIONS")
+                .allowedHeaders("*");
+    }
+
+    // 추가
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(authInterceptor)
+                // 일단 모든 경로를 잠그고
+                .addPathPatterns("/**")
+                // 로그인 없이도 써야 하는 경로만 예외로 열어줍니다
+                .excludePathPatterns(
+                        "/auth/**",              // 로그인
+                        "/members",              // 회원가입 (POST /members)
+                        "/members/nickname/**",  // 닉네임 중복 체크
+                        "/members/email/**",     // 이메일 중복 체크
+                        "/members/*/ratings",    // 유저별 평점 조회 (누구나 볼 수 있는 목록)
+                        "/error"                 // 스프링이 내부적으로 쓰는 경로
+                );
+    }
+
+    // WebConfig.java 에 추가
+    private final LoginMemberArgumentResolver loginMemberArgumentResolver;   // 필드 추가
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(loginMemberArgumentResolver);
+    }
+}

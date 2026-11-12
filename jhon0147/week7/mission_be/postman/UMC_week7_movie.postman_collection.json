@@ -1,8 +1,7 @@
 {
   "info": {
-    "name": "UMC 7주차 · 로그인과 평점 소유권",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "순서대로 실행합니다. 01~11이 워크북의 9단계(가입·로그인 각각 두 요청)입니다. 실습용 계정과 토큰만 사용합니다. 요청 03, 12, 08, 05를 각각 캡처합니다. 만료 선택 미션은 별도 컬렉션에서 수동 실행합니다."
+    "name": "UMC 7주차",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
@@ -40,7 +39,7 @@
   ],
   "item": [
     {
-      "name": "01 · 준비: 회원 A 가입",
+      "name": "1. 회원 A 가입",
       "request": {
         "method": "POST",
         "header": [
@@ -90,7 +89,7 @@
       ]
     },
     {
-      "name": "02 · 준비: 회원 B 가입",
+      "name": "2. 회원 B 가입",
       "request": {
         "method": "POST",
         "header": [
@@ -127,7 +126,7 @@
       ]
     },
     {
-      "name": "03 · 로그인 성공 A [필수 캡처 1]",
+      "name": "3. 로그인 성공 A ",
       "request": {
         "method": "POST",
         "header": [
@@ -166,7 +165,7 @@
       ]
     },
     {
-      "name": "04 · 로그인 성공 B",
+      "name": "4. 로그인 성공 B",
       "request": {
         "method": "POST",
         "header": [
@@ -203,7 +202,7 @@
       ]
     },
     {
-      "name": "05 · A 평점 등록 [필수 캡처 4]",
+      "name": "5. A 평점 등록",
       "request": {
         "method": "POST",
         "header": [
@@ -246,7 +245,7 @@
       ]
     },
     {
-      "name": "06 · 같은 영화 중복 등록 409",
+      "name": "6. 같은 영화 중복 등록 409",
       "request": {
         "method": "POST",
         "header": [
@@ -286,7 +285,7 @@
       ]
     },
     {
-      "name": "07 · 본인 평점 수정 200",
+      "name": "7. 본인 평점 수정 200",
       "request": {
         "method": "PATCH",
         "header": [
@@ -327,7 +326,7 @@
       ]
     },
     {
-      "name": "08 · B가 A 평점 수정 403 [필수 캡처 3]",
+      "name": "8. B가 A 평점 수정 403",
       "request": {
         "method": "PATCH",
         "header": [
@@ -367,7 +366,7 @@
       ]
     },
     {
-      "name": "09 · 토큰 없이 평점 수정 401",
+      "name": "9. 토큰 없이 평점 수정 401",
       "request": {
         "method": "PATCH",
         "header": [
@@ -403,7 +402,7 @@
       ]
     },
     {
-      "name": "10 · 없는 평점 삭제 404",
+      "name": "10. 없는 평점 삭제 404",
       "request": {
         "method": "DELETE",
         "header": [
@@ -430,7 +429,7 @@
       ]
     },
     {
-      "name": "11 · 본인 평점 삭제 200",
+      "name": "11. 본인 평점 삭제 200",
       "request": {
         "method": "DELETE",
         "header": [
@@ -458,7 +457,7 @@
       ]
     },
     {
-      "name": "12 · 토큰 없이 내 정보 조회 401 [필수 캡처 2]",
+      "name": "12. 토큰 없이 내 정보 조회 401",
       "request": {
         "method": "GET",
         "header": [],
@@ -480,7 +479,7 @@
       ]
     },
     {
-      "name": "13 · 내 정보 조회 200 [선택 캡처]",
+      "name": "13. 내 정보 조회 200",
       "request": {
         "method": "GET",
         "header": [
@@ -509,7 +508,7 @@
       ]
     },
     {
-      "name": "14 · 자기 닉네임 그대로 수정 200",
+      "name": "14. 자기 닉네임 그대로 수정 200",
       "request": {
         "method": "PATCH",
         "header": [
@@ -549,7 +548,7 @@
       ]
     },
     {
-      "name": "15 · 다른 회원의 닉네임 사용 409",
+      "name": "15. 다른 회원의 닉네임 사용 409",
       "request": {
         "method": "PATCH",
         "header": [
@@ -589,7 +588,7 @@
       ]
     },
     {
-      "name": "16 · 새 닉네임으로 수정 200",
+      "name": "16. 새 닉네임으로 수정 200",
       "request": {
         "method": "PATCH",
         "header": [
@@ -630,7 +629,7 @@
       ]
     },
     {
-      "name": "17 · 틀린 비밀번호로 로그인 401",
+      "name": "17. 틀린 비밀번호로 로그인 401",
       "request": {
         "method": "POST",
         "header": [
@@ -667,7 +666,7 @@
       ]
     },
     {
-      "name": "18 · 없는 이메일의 로그인 401",
+      "name": "18. 없는 이메일의 로그인 401",
       "request": {
         "method": "POST",
         "header": [
@@ -704,7 +703,7 @@
       ]
     },
     {
-      "name": "19 · 변조한 토큰 401",
+      "name": "19. 변조한 토큰 401",
       "request": {
         "method": "GET",
         "header": [
@@ -742,7 +741,7 @@
       ]
     },
     {
-      "name": "20 · 공개 평점 조회 200",
+      "name": "20. 공개 평점 조회 200",
       "request": {
         "method": "GET",
         "header": [],
@@ -765,7 +764,7 @@
       ]
     },
     {
-      "name": "21 · 별점 범위 위반 400",
+      "name": "21. 별점 범위 위반 400",
       "request": {
         "method": "POST",
         "header": [
@@ -805,7 +804,7 @@
       ]
     },
     {
-      "name": "22 · 닉네임 길이 위반 400",
+      "name": "22. 닉네임 길이 위반 400",
       "request": {
         "method": "PATCH",
         "header": [
@@ -845,7 +844,7 @@
       ]
     },
     {
-      "name": "23 · 소유권 확인용 평점 등록",
+      "name": "23. 소유권 확인용 평점 등록",
       "request": {
         "method": "POST",
         "header": [
@@ -886,7 +885,7 @@
       ]
     },
     {
-      "name": "24 · B가 A 평점 삭제도 403",
+      "name": "24. B가 A 평점 삭제도 403",
       "request": {
         "method": "DELETE",
         "header": [
@@ -913,7 +912,7 @@
       ]
     },
     {
-      "name": "25 · 권한 거절 후 평점 유지 확인",
+      "name": "25. 권한 거절 후 평점 유지 확인",
       "request": {
         "method": "GET",
         "header": [],
@@ -936,7 +935,7 @@
       ]
     },
     {
-      "name": "26 · 본인 평점 정리",
+      "name": "26. 본인 평점 정리",
       "request": {
         "method": "DELETE",
         "header": [

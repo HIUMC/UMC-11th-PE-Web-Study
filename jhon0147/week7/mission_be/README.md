@@ -46,7 +46,9 @@ IntelliJ 실행 구성의 Environment variables에 DB_URL, DB_USER, DB_PW, JWT_S
 
 테스트에는 워크북의 9단계, 회원 정보 수정, 401 사유 구분, JWT 변조·만료, 타인 평점 수정·삭제 거절, memberId 위조 시도, CORS 사전 요청 등이 포함된다.
 
-현재 작성 환경에서는 운영 소스 33개의 Java 21 컴파일을 확인했다. Gradle의 전체 테스트와 서버 실행은 의존성 다운로드 제한 때문에 완료하지 못했다. Postman 실제 실행과 제출용 캡처도 남아 있다. 예시 응답을 실행 결과로 사용하지 않는다.
+2026-11-12에 `.\gradlew.bat clean test --refresh-dependencies --console=plain`을 실행해 테스트 28개가 모두 통과했다. 실패·오류·건너뛴 테스트는 없다. 데모 프로필의 서버 기동, 메인 화면의 HTTP 200, 토큰 없는 `GET /members/me`의 HTTP 401 / AUTH401_2 응답도 확인했다.
+
+Postman 컬렉션 직접 실행과 제출용 캡처는 남아 있다. 예시 응답을 실행 결과로 사용하지 않는다.
 
 ## 제출 캡처
 

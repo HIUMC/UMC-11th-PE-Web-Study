@@ -1,8 +1,7 @@
 {
   "info": {
     "name": "UMC 7주차 선택 · 60초 토큰 만료",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "run-demo.ps1 -TokenSeconds 60으로 시작합니다. 아래 요청은 수동으로 01→02→03→04 순서로 보냅니다. 03의 성공 응답을 캡처한 후 61초가 지난 뒤 04를 보내세요. Runner로 한꺼번에 실행하지 마세요."
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
@@ -102,7 +101,7 @@
       ]
     },
     {
-      "name": "03 · 만료 전 내 정보 조회 [캡처]",
+      "name": "03 · 만료 전 내 정보 조회",
       "request": {
         "method": "GET",
         "header": [
@@ -129,7 +128,7 @@
       ]
     },
     {
-      "name": "04 · 발급 후 61초 지난 뒤 전송 [캡처]",
+      "name": "04 · 발급 후 61초 지난 뒤 전송",
       "request": {
         "method": "GET",
         "header": [

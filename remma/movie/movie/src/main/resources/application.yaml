@@ -7,3 +7,8 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+
+# 7주차 추가: JWT 설정
+jwt:
+  secret: ${JWT_SECRET:umc-11th-movie-rating-secret-key-please-change-me} # 서명에 쓸 비밀키 (최소 32자 이상)
+  access-expiration: ${JWT_ACCESS_EXPIRATION:3600} # 토큰 유효시간(초, 3600 = 1시간)

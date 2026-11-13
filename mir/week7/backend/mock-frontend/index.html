@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>5주차 백엔드 API 연결 확인</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 24px;
+        line-height: 1.5;
+      }
+      .box {
+        margin-bottom: 20px;
+        padding: 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+      }
+      button {
+        padding: 8px 14px;
+        cursor: pointer;
+      }
+      pre {
+        background: #f8fafc;
+        padding: 12px;
+        border-radius: 6px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>영화 평점 서비스 API 연결 테스트</h1>
+
+    <!-- 1. 닉네임 중복 체크 -->
+    <div class="box">
+      <h3>1. 닉네임 중복 체크 (GET /members/nickname/noco)</h3>
+      <button onclick="testNickname()">닉네임 'noco' 검사</button>
+      <pre id="nickname-result">결과가 여기에 표시됩니다.</pre>
+    </div>
+
+    <!-- 2. 이메일 중복 체크 -->
+    <div class="box">
+      <h3>2. 이메일 중복 체크 (GET /members/email/noco@umc.com)</h3>
+      <button onclick="testEmail()">이메일 'noco@umc.com' 검사</button>
+      <pre id="email-result">결과가 여기에 표시됩니다.</pre>
+    </div>
+
+    <!-- 3. 유저별 평점 조회 -->
+    <div class="box">
+      <h3>3. 유저별 평점 조회 (GET /members/1/ratings)</h3>
+      <button onclick="testRatings()">1번 유저 평점 조회</button>
+      <pre id="ratings-result">결과가 여기에 표시됩니다.</pre>
+    </div>
+
+    <script>
+      const BASE_URL = "http://localhost:8080";
+
+      async function testNickname() {
+        try {
+          const res = await fetch(`${BASE_URL}/members/nickname/noco`);
+          const data = await res.json();
+          document.getElementById("nickname-result").textContent =
+            JSON.stringify(data, null, 2);
+        } catch (err) {
+          document.getElementById("nickname-result").textContent =
+            "에러 발생: " + err.message;
+        }
+      }
+
+      async function testEmail() {
+        try {
+          const res = await fetch(`${BASE_URL}/members/email/noco@umc.com`);
+          const data = await res.json();
+          document.getElementById("email-result").textContent = JSON.stringify(
+            data,
+            null,
+            2,
+          );
+        } catch (err) {
+          document.getElementById("email-result").textContent =
+            "에러 발생: " + err.message;
+        }
+      }
+
+      async function testRatings() {
+        try {
+          const res = await fetch(`${BASE_URL}/members/1/ratings`);
+          const data = await res.json();
+          document.getElementById("ratings-result").textContent =
+            JSON.stringify(data, null, 2);
+        } catch (err) {
+          document.getElementById("ratings-result").textContent =
+            "에러 발생: " + err.message;
+        }
+      }
+    </script>
+  </body>
+</html>

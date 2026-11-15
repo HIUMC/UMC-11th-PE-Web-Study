@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useBookmarkStore } from "../../stores/bookmark-store";
+import { useFavorites, useToggleFavorite } from "../../hooks/use-favorites";
 import type { Movie } from "../../types/movie";
 
 type MovieCardProps = {
@@ -11,10 +11,9 @@ const bookmarkOutlineIcon = "/icons/movie-icons/movie-icons/bookmark-outline.svg
 
 export default function MovieCard({ movie }: MovieCardProps) {
   const posterUrl = movie.posterPath;
-  const isBookmarked = useBookmarkStore((state) =>
-    state.bookmarkedMovieIds.includes(movie.id),
-  );
-  const toggleBookmark = useBookmarkStore((state) => state.toggleBookmark);
+  const favoritesQuery = useFavorites();
+  const toggleFavorite = useToggleFavorite();
+  const isBookmarked = favoritesQuery.data?.includes(movie.id) ?? false;
 
   return (
     <article>
@@ -34,7 +33,10 @@ export default function MovieCard({ movie }: MovieCardProps) {
         </Link>
         <button
           type="button"
-          onClick={() => toggleBookmark(movie.id)}
+          onClick={() =>
+            toggleFavorite.mutate({ movieId: movie.id, isFavorite: isBookmarked })
+          }
+          disabled={toggleFavorite.isPending}
           aria-label={`${movie.title} 북마크 ${isBookmarked ? "해제" : "추가"}`}
           aria-pressed={isBookmarked}
           className={`absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-[6px] border ${

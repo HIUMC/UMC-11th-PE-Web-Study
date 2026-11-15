@@ -1,9 +1,11 @@
 
 import { Link, useParams } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { getMovieDetail } from "../../api/movies/get-movie-detail";
-import { useBookmarkStore } from "../../stores/bookmark-store";
+import { getMe } from "../../api/members/me";
+import { createRating, getMemberRatings, updateRating } from "../../api/ratings";
+import { useFavorites, useToggleFavorite } from "../../hooks/use-favorites";
 import { cn } from "../../utils/cn";
 import { getMovieDetailErrorMessage } from "../../utils/movies/get-movie-detail-error-message";
 import {
@@ -16,6 +18,7 @@ const starIcon = "/icons/movie-icons/movie-icons/star.svg";
 const starOutlineIcon = "/icons/movie-icons/movie-icons/star-outline.svg";
 
 export function MovieDetailPage() {
+  const queryClient = useQueryClient();
   const { movieId: movieIdParam } = useParams({
     from: "/movies/$movieId",
   });
@@ -32,21 +35,51 @@ export function MovieDetailPage() {
 
   const movie = movieDetailQuery.data;
 
-  const isBookmarked = useBookmarkStore((state) =>
-    movie ? state.bookmarkedMovieIds.includes(movie.id) : false
-  );
-
-  const toggleBookmark = useBookmarkStore(
-    (state) => state.toggleBookmark
-  );
+  const favoritesQuery = useFavorites();
+  const toggleFavorite = useToggleFavorite();
+  const isBookmarked = movie
+    ? favoritesQuery.data?.includes(movie.id) ?? false
+    : false;
+  const meQuery = useQuery({
+    queryKey: ["members", "me"],
+    queryFn: getMe,
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+  const memberId = meQuery.data?.memberId ?? meQuery.data?.id;
+  const ratingsQuery = useQuery({
+    queryKey: ["members", memberId, "ratings"],
+    queryFn: () => getMemberRatings(memberId!),
+    enabled: Boolean(memberId),
+    retry: false,
+  });
 
   const [rating, setRating] = useState(0);
   const [review, setReview] = useState("");
   const [isSaved, setIsSaved] = useState(false);
+  const savedRating = ratingsQuery.data?.find((item) => item.movieId === movieId);
+  const saveRatingMutation = useMutation({
+    mutationFn: () =>
+      savedRating
+        ? updateRating(savedRating.ratingId, {
+            score: rating,
+            comment: review.trim() || null,
+          })
+        : createRating({
+            movieId,
+            score: rating,
+            comment: review.trim() || null,
+          }),
+    onSuccess: () => {
+      setIsSaved(true);
+      queryClient.invalidateQueries({ queryKey: ["members", memberId, "ratings"] });
+    },
+  });
 
   function handleReviewSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsSaved(true);
+    if (rating === 0 || saveRatingMutation.isPending) return;
+    saveRatingMutation.mutate();
   }
 
   // 잘못된 영화 ID 또는 데이터 요청 오류
@@ -179,7 +212,10 @@ export function MovieDetailPage() {
 
           <button
             type="button"
-            onClick={() => toggleBookmark(movie.id)}
+            onClick={() =>
+              toggleFavorite.mutate({ movieId: movie.id, isFavorite: isBookmarked })
+            }
+            disabled={toggleFavorite.isPending}
             aria-pressed={isBookmarked}
             className={cn(
               "mt-5 inline-flex h-10 items-center gap-2 rounded-lg border px-4 text-sm font-semibold transition",
@@ -254,10 +290,16 @@ export function MovieDetailPage() {
 
             <button
               type="submit"
-              disabled={rating === 0}
+              disabled={rating === 0 || saveRatingMutation.isPending}
               className="mt-2 h-10 w-full rounded-lg bg-[#191D23] text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-40"
             >
-              {isSaved ? "저장 완료" : "평점 저장"}
+              {saveRatingMutation.isPending
+                ? "저장 중"
+                : isSaved
+                  ? "저장 완료"
+                  : savedRating
+                    ? "평점 수정"
+                    : "평점 저장"}
             </button>
           </form>
         </aside>

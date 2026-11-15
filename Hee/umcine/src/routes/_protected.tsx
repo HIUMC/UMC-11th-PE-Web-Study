@@ -3,7 +3,7 @@ import { useAuthStore } from "../stores/auth-store";
 
 export const Route = createFileRoute("/_protected")({
   beforeLoad: () => {
-    if (!useAuthStore.getState().user) {
+    if (!useAuthStore.getState().accessToken) {
       throw redirect({ to: "/login" });
     }
   },

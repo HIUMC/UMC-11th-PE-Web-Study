@@ -56,7 +56,7 @@ export function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-[calc(100vh-73px)] items-center justify-center bg-[#f5f6f8] px-6 py-30">
+    <main className="flex min-h-[calc(100vh-73px)] items-center justify-center bg-[#f5f6f8] px-6 py-20">
       <div className="w-full max-w-[440px]">
         <h1 className="text-[28px] font-bold text-neutral-900">로그인</h1>
 

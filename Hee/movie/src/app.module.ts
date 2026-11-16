@@ -1,7 +1,8 @@
-// src/app.module.ts
 import { Module } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { JwtModule } from "@nestjs/jwt";
+
 import { Member } from "./entity/member.entity.js";
 import { Rating } from "./entity/rating.entity.js";
 import { MemberController } from "./controller/member.controller.js";
@@ -9,9 +10,13 @@ import { RatingController } from "./controller/rating.controller.js";
 import { MemberService } from "./service/member.service.js";
 import { RatingService } from "./service/rating.service.js";
 
+import { AuthController } from "./controller/auth.controller.js";
+import { AuthService } from "./service/auth.service.js";
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+
     TypeOrmModule.forRoot({
       type: "mysql",
       host: process.env.DB_HOST,
@@ -22,9 +27,34 @@ import { RatingService } from "./service/rating.service.js";
       autoLoadEntities: true,
       synchronize: true,
     }),
+
     TypeOrmModule.forFeature([Member, Rating]),
+
+    // JWT 모듈 추가
+    JwtModule.registerAsync({
+      global: true,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.getOrThrow<string>("JWT_SECRET"),
+        signOptions: {
+          expiresIn: Number(
+            configService.get<string>("JWT_ACCESS_EXPIRATION") ?? 3600
+          ),
+        },
+      }),
+    }),
   ],
-  controllers: [MemberController, RatingController],
-  providers: [MemberService, RatingService],
+
+  controllers: [
+    MemberController,
+    RatingController,
+    AuthController,
+  ],
+
+  providers: [
+    MemberService,
+    RatingService,
+    AuthService,
+  ],
 })
 export class AppModule {}

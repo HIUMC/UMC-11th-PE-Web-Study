@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState, type SubmitEvent } from "react";
 import { searchMovies } from "../../api/movies/search-movies";
-import { useBookmarkStore } from "../../stores/bookmark-store";
+import { useFavorites, useToggleFavorite } from "../../hooks/use-favorites";
 import { adaptTmdbMovie } from "../../utils/movies/adapt-tmdb-movie";
 
 const searchIcon = "/icons/movie-icons/movie-icons/search.svg";
@@ -16,12 +16,9 @@ export function SearchPage() {
 
   const [searchText, setSearchText] = useState(query ?? "");
 
-  const bookmarkedMovieIds = useBookmarkStore(
-    (state) => state.bookmarkedMovieIds
-  );
-  const toggleBookmark = useBookmarkStore(
-    (state) => state.toggleBookmark
-  );
+  const favoritesQuery = useFavorites();
+  const toggleFavorite = useToggleFavorite();
+  const bookmarkedMovieIds = favoritesQuery.data ?? [];
 
   const normalizedQuery = query?.trim() ?? "";
 
@@ -210,7 +207,13 @@ export function SearchPage() {
 
                   <button
                     type="button"
-                    onClick={() => toggleBookmark(movie.id)}
+                    onClick={() =>
+                      toggleFavorite.mutate({
+                        movieId: movie.id,
+                        isFavorite: bookmarkedMovieIds.includes(movie.id),
+                      })
+                    }
+                    disabled={toggleFavorite.isPending}
                     aria-label={`${movie.title} 북마크 ${
                       bookmarkedMovieIds.includes(movie.id)
                         ? "해제"

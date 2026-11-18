@@ -33,7 +33,11 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/error");
+                .excludePathPatterns(
+                        "/error",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/swagger-config"
+                );
     }
 
     @Override

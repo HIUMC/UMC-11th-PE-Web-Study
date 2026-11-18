@@ -31,3 +31,9 @@ server:
 jwt:
   secret: ${JWT_SECRET}
   access-expiration: ${JWT_ACCESS_EXPIRATION:3600}
+
+springdoc:
+  swagger-ui:
+    url: /week8-openapi.yaml
+    disable-swagger-default-url: true
+    persist-authorization: false

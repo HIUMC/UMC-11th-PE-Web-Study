@@ -1,0 +1,14 @@
+{
+  "source" : "Spring MockMvc + H2 integration test (not Postman)",
+  "method" : "DELETE",
+  "url" : "/favorites/550",
+  "authorization" : "Bearer <redacted>",
+  "request" : null,
+  "status" : 200,
+  "response" : {
+    "isSuccess" : true,
+    "code" : "COMMON200",
+    "message" : "즐겨찾기를 해제했습니다.",
+    "result" : null
+  }
+}

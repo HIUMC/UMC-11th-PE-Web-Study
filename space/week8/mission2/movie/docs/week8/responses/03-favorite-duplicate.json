@@ -1,0 +1,16 @@
+{
+  "source" : "Spring MockMvc + H2 integration test (not Postman)",
+  "method" : "POST",
+  "url" : "/favorites",
+  "authorization" : "Bearer <redacted>",
+  "request" : {
+    "movieId" : 550
+  },
+  "status" : 409,
+  "response" : {
+    "isSuccess" : false,
+    "code" : "FAVORITE409_1",
+    "message" : "이미 즐겨찾기한 영화입니다.",
+    "result" : null
+  }
+}

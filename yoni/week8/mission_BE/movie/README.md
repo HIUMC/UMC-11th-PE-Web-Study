@@ -1,32 +1,43 @@
-# Week 7
+# Week 8
 
-## BE
+## FE
 
 ### 주제
 
-NestJS 기반 JWT 로그인 및 인증·인가 구현
+useMutation을 활용한 API 요청 상태 관리 및 캐시 갱신
 
 ### 구현 내용
 
-- 로그인 `POST /auth/login`
-- bcrypt로 비밀번호를 검증하고 JWT Access Token 발급
-- 내 정보 조회 `GET /members/me`
-- 내 정보 수정 `PATCH /members/me`
-- AuthGuard를 활용한 Authorization 헤더의 토큰 검증
-- 평점 등록 `POST /ratings`
-- 평점 수정 `PATCH /ratings/:ratingId`
-- 평점 삭제 `DELETE /ratings/:ratingId`
-- 평점 요청 경로에서 memberId를 제거하고 검증된 토큰에서 회원 ID 추출
-- 평점 수정·삭제 시 작성자와 요청자를 비교하는 소유권 검증
-- 평점 삭제 응답을 200 OK와 result: null로 변경
+- 회원가입 요청 상태 관리를 useMutation으로 전환
+- 로그인 API 연동 및 Zustand persist를 활용한 토큰 저장
+- 인증 요청에 토큰을 첨부하고 401 응답 시 토큰 초기화
+- 로그인 성공 후 내 정보 캐시 무효화 및 홈 이동
+- 로그아웃 시 토큰과 회원 관련 캐시 정리
+- 내 정보 조회 및 닉네임 수정 API 연동
+- setQueryData를 활용한 수정 결과 반영
+- Route Group과 공통 Layout Route로 로그인 전용 페이지 구성
+- 마이페이지와 내 정보 수정 화면을 별도 페이지로 분리
+- 즐겨찾기 조회·추가·해제 API 연동
+- 영화 목록·상세·검색·마이페이지의 즐겨찾기 상태 갱신
 
 ### 학습 내용
 
-- 인증(Authentication)과 인가(Authorization)의 차이
-- bcrypt를 활용한 입력 비밀번호와 저장된 해시 비교
-- JWT의 Header, Payload, Signature 구조와 Claim
-- Bearer 인증과 Authorization 헤더를 통한 토큰 전달
-- Guard를 활용한 컨트롤러 실행 전 인증 처리
-- TypeScript 요청 타입 확장을 통한 memberId 속성 정의
-- HTTP 상태 코드 401과 403의 차이
-- Postman과 두 회원 계정을 활용한 인증·소유권 검증 테스트
+- 클라이언트 상태와 서버 상태의 차이
+- useMutation의 요청 진행 상태와 성공·실패 처리
+- 로그인 토큰과 회원 정보의 관리 위치 구분
+- invalidateQueries와 setQueryData의 차이
+- 회원별 query key를 통한 캐시 구분
+- Route Group, Layout Route와 Outlet의 역할
+
+### 트러블 슈팅
+
+- 새 경로 추가 후 타입 오류 발생
+- 개발 서버를 재실행하여 자동 생성 경로 목록 갱신
+- 브라우저에 저장한 즐겨찾기가 로그아웃 후에도 남는 문제 발생
+- 서버 API와 회원별 Query 캐시를 사용하도록 변경
+- 선택하지 않은 영화가 마이페이지에 표시되어 API 응답과 DB 확인
+- 현재 계정에 저장된 테스트 데이터임을 확인
+
+### 미완료 항목
+
+- 영화 상세의 평점 조회·등록·수정·삭제 API 연동

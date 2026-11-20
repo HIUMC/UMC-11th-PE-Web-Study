@@ -1,0 +1,33 @@
+{
+  "source" : "Spring MockMvc + H2 integration test (not Postman)",
+  "method" : "POST",
+  "url" : "/movie-records",
+  "authorization" : "Bearer <redacted>",
+  "request" : {
+    "movieId" : 238,
+    "score" : 5,
+    "comment" : "다시 보고 싶은 영화",
+    "addToFavorites" : true
+  },
+  "status" : 201,
+  "response" : {
+    "isSuccess" : true,
+    "code" : "COMMON201",
+    "message" : "영화 기록을 저장했습니다.",
+    "result" : {
+      "rating" : {
+        "ratingId" : 1,
+        "movieId" : 238,
+        "score" : 5,
+        "comment" : "다시 보고 싶은 영화",
+        "createdAt" : "2026-11-19T00:24:35.815909",
+        "updatedAt" : "2026-11-19T00:24:35.815909"
+      },
+      "favorite" : {
+        "favoriteId" : 2,
+        "movieId" : 238,
+        "createdAt" : "2026-11-19T00:24:35.815909"
+      }
+    }
+  }
+}

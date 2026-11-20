@@ -1,0 +1,18 @@
+{
+  "source" : "Spring MockMvc + H2 integration test (not Postman)",
+  "method" : "POST",
+  "url" : "/movie-records",
+  "authorization" : "Bearer <redacted>",
+  "request" : {
+    "movieId" : 238,
+    "score" : 5,
+    "addToFavorites" : true
+  },
+  "status" : 409,
+  "response" : {
+    "isSuccess" : false,
+    "code" : "RATING409_1",
+    "message" : "이미 이 영화에 평점을 남기셨습니다.",
+    "result" : null
+  }
+}

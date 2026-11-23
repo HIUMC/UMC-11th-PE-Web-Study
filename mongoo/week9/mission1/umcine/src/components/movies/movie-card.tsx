@@ -1,0 +1,90 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { cn } from "../../utils/cn";
+import { useFavorites } from "../../hooks/use-favorites";
+import type { TmdbMovieListItem } from "../../api/movies/models";
+import { getTmdbPosterUrl } from "../../utils/movies/tmdb-image";
+
+interface MovieCardProps {
+  movie: TmdbMovieListItem;
+}
+
+export function MovieCard({ movie }: MovieCardProps) {
+  const posterUrl = getTmdbPosterUrl(movie.poster_path);
+
+  const {
+    bookmarkedMovieIds,
+    toggleBookmark,
+    isBookmarkDisabled,
+    bookmarkError,
+  } = useFavorites();
+
+  const isBookmarked = bookmarkedMovieIds.includes(movie.id);
+
+  return (
+    <div className="relative min-w-0">
+      <Link
+        href={`/movies/${movie.id}`}
+        className="block min-w-0"
+      >
+        <div className="aspect-[200/228] w-full overflow-hidden rounded-lg">
+          {posterUrl ? (
+            <Image
+              src={posterUrl}
+              alt={movie.title}
+              width={200}
+              height={228}
+              sizes="(max-width: 639px) calc(100vw - 48px), (max-width: 767px) 50vw, (max-width: 1023px) 33vw, 200px"
+              className="block h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center bg-gray-200 text-sm text-gray-500">
+              이미지 없음
+            </div>
+          )}
+        </div>
+
+        <p className="mt-[7px] truncate text-[13px] font-bold leading-[1.4] text-[#171717]">
+          {movie.title}
+        </p>
+
+        <p className="mt-[3px] text-[11px] leading-[1.4] text-[#9ca3af]">
+          {movie.release_date}
+        </p>
+      </Link>
+
+      <button
+        type="button"
+        aria-label={
+          isBookmarked ? "즐겨찾기 해제" : "즐겨찾기 추가"
+        }
+        aria-pressed={isBookmarked}
+        disabled={isBookmarkDisabled}
+        title={
+          bookmarkError
+            ? "즐겨찾기 조회 실패: 눌러서 다시 시도"
+            : undefined
+        }
+        onClick={() => toggleBookmark(movie.id)}
+        className={cn(
+          "absolute right-[9px] top-[9px] flex h-[31px] w-[31px] cursor-pointer items-center justify-center rounded-md border p-0 hover:opacity-90 disabled:cursor-wait disabled:opacity-50",
+          isBookmarked
+            ? "border-[#2563eb] bg-[#2563eb]"
+            : "border-white bg-[#141414]/75",
+        )}
+      >
+        <img
+          src={
+            isBookmarked
+              ? "/icons/bookmark.svg"
+              : "/icons/bookmark-outline.svg"
+          }
+          alt=""
+          className="h-4 w-4 invert"
+        />
+      </button>
+    </div>
+  );
+}

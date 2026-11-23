@@ -1,9 +1,11 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
+import { favoriteKeys } from "../api/favorites/favorite-keys";
 import { myInfoQueryKey } from "../api/members/get-my-info";
+import { ratingKeys } from "../api/ratings/rating-keys";
 import { useAuthStore } from "../stores/auth-store";
 
-/** 토큰과 내 정보 캐시를 지우고 홈으로 이동해요. */
+/** 토큰과 사용자별 캐시(내 정보, 즐겨찾기, 평점)를 지우고 홈으로 이동해요. */
 export function useLogout() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -14,5 +16,7 @@ export function useLogout() {
     await navigate({ to: "/" });
     clearAuth();
     queryClient.removeQueries({ queryKey: myInfoQueryKey });
+    queryClient.removeQueries({ queryKey: favoriteKeys.all });
+    queryClient.removeQueries({ queryKey: ratingKeys.all });
   };
 }

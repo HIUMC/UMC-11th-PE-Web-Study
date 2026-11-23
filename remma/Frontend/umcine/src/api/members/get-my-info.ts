@@ -1,4 +1,4 @@
-import { apiClient } from "../api-client";
+import { authApi } from "../auth-api";
 import type { ApiResponse } from "../api-response";
 import type { MemberResult } from "./signup";
 
@@ -8,7 +8,7 @@ export type MyInfoResponse = ApiResponse<MemberResult>;
 export const myInfoQueryKey = ["members", "me"] as const;
 
 export async function getMyInfo() {
-  const response = await apiClient.get("members/me").json<MyInfoResponse>();
+  const response = await authApi.get("members/me").json<MyInfoResponse>();
 
   if (!response.result) {
     throw new Error(response.message || "내 정보를 불러오지 못했어요.");

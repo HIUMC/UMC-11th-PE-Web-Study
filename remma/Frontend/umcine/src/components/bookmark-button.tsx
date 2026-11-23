@@ -1,9 +1,16 @@
 import type { MouseEvent } from "react";
-import { useBookmarkStore } from "../stores/bookmark-store";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import {
+  useAddFavoriteMutation,
+  useRemoveFavoriteMutation,
+} from "../hooks/use-favorite-mutations";
+import { useFavoritesQuery } from "../hooks/use-favorites-query";
+import { useAuthStore } from "../stores/auth-store";
 import { cn } from "../utils/cn";
 
 interface BookmarkButtonProps {
   movieId: number;
+  movieTitle?: string;
   /** overlay: 포스터 위 아이콘 버튼, labeled: 아이콘 + 텍스트 버튼 */
   variant?: "overlay" | "labeled";
   className?: string;
@@ -27,40 +34,65 @@ function BookmarkIcon({ filled }: { filled: boolean }) {
   );
 }
 
-export function BookmarkButton({ movieId, variant = "labeled", className }: BookmarkButtonProps) {
-  // 이 영화의 북마크 여부만 구독해서, 다른 영화가 바뀔 때는 리렌더링되지 않아요.
-  const isBookmarked = useBookmarkStore((state) =>
-    state.bookmarkedMovieIds.includes(movieId),
-  );
-  const toggleBookmark = useBookmarkStore(
-    (state) => state.toggleBookmark,
-  );
+export function BookmarkButton({
+  movieId,
+  movieTitle,
+  variant = "labeled",
+  className,
+}: BookmarkButtonProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const favoritesQuery = useFavoritesQuery();
+  const addFavoriteMutation = useAddFavoriteMutation();
+  const removeFavoriteMutation = useRemoveFavoriteMutation();
 
-  const label = isBookmarked ? "북마크 해제" : "북마크 추가";
+  const isFavorite =
+    Boolean(accessToken) &&
+    (favoritesQuery.data?.some((item) => item.movieId === movieId) ?? false);
+
+  const isPending =
+    addFavoriteMutation.isPending || removeFavoriteMutation.isPending;
+
+  const visibleLabel = isFavorite ? "즐겨찾기 해제" : "즐겨찾기";
+  const overlayAriaLabel = movieTitle ? `${movieTitle} 즐겨찾기` : "즐겨찾기";
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     // 카드처럼 링크 근처에 있을 때 상세 페이지로 이동하지 않도록 막아요.
     event.preventDefault();
     event.stopPropagation();
-    toggleBookmark(movieId);
+
+    if (!accessToken) {
+      navigate({ to: "/login", search: { redirect: location.href } });
+      return;
+    }
+
+    if (isPending) return;
+
+    if (isFavorite) {
+      removeFavoriteMutation.mutate(movieId);
+    } else {
+      addFavoriteMutation.mutate({ movieId });
+    }
   };
 
   if (variant === "overlay") {
     return (
       <button
         type="button"
-        aria-label={label}
-        aria-pressed={isBookmarked}
+        aria-label={overlayAriaLabel}
+        aria-pressed={isFavorite}
+        disabled={isPending}
         onClick={handleClick}
         className={cn(
-          "absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-lg shadow-sm transition-colors",
-          isBookmarked
+          "absolute right-2.5 top-2.5 flex h-8 w-8 items-center justify-center rounded-lg shadow-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-60",
+          isFavorite
             ? "bg-blue-600 text-white"
             : "bg-black/50 text-white/90 backdrop-blur-xs hover:bg-black/70",
           className,
         )}
       >
-        <BookmarkIcon filled={isBookmarked} />
+        <BookmarkIcon filled={isFavorite} />
       </button>
     );
   }
@@ -68,18 +100,20 @@ export function BookmarkButton({ movieId, variant = "labeled", className }: Book
   return (
     <button
       type="button"
-      aria-pressed={isBookmarked}
+      aria-pressed={isFavorite}
+      disabled={isPending}
       onClick={handleClick}
       className={cn(
-        "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors",
-        isBookmarked
+        "inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-not-allowed disabled:opacity-60",
+        isFavorite
           ? "bg-blue-600 text-white hover:bg-blue-700"
           : "border border-gray-300 text-gray-700 hover:bg-gray-50",
         className,
       )}
     >
-      <BookmarkIcon filled={isBookmarked} />
-      {label}
+      <BookmarkIcon filled={isFavorite} />
+      {movieTitle && <span className="sr-only">{movieTitle} </span>}
+      {visibleLabel}
     </button>
   );
 }

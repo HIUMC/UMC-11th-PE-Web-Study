@@ -28,7 +28,7 @@ export function SearchPage() {
   }
 
   return (
-    <main className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+    <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
       {!normalizedQuery ? (
         /* 1. 빈 검색어 상태 (3주차 Figma 중앙 검색창 레이아웃) */
         <div className="flex min-h-[60vh] flex-col items-center justify-center">
@@ -124,7 +124,11 @@ export function SearchPage() {
                               </div>
                             )}
                           </Link>
-                          <BookmarkButton movieId={movie.id} variant="overlay" />
+                          <BookmarkButton
+                            movieId={movie.id}
+                            movieTitle={movie.title}
+                            variant="overlay"
+                          />
                         </div>
 
                         <div className="flex flex-1 flex-col justify-between">
@@ -164,7 +168,7 @@ export function SearchPage() {
           )}
         </>
       )}
-    </main>
+    </div>
   );
 }
 

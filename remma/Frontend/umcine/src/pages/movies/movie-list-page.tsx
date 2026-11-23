@@ -32,7 +32,7 @@ export function MovieListPage() {
   };
 
   return (
-    <main className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
+    <div className="mx-auto max-w-7xl px-6 py-8 lg:px-8">
       <h1 className="mb-6 text-2xl font-extrabold text-gray-950">영화 목록</h1>
       {moviesQuery.isPending ? (
         <p className="py-12 text-center text-gray-500">
@@ -87,7 +87,7 @@ export function MovieListPage() {
           </div>
         </>
       )}
-    </main>
+    </div>
   );
 }
 

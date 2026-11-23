@@ -1,4 +1,4 @@
-import { apiClient } from "../api-client";
+import { authApi } from "../auth-api";
 import type { ApiResponse } from "../api-response";
 import type { MemberResult } from "./signup";
 
@@ -12,7 +12,7 @@ export interface UpdateMyInfoRequest {
 export type UpdateMyInfoResponse = ApiResponse<MemberResult>;
 
 export function updateMyInfo(request: UpdateMyInfoRequest) {
-  return apiClient
+  return authApi
     .patch("members/me", { json: request })
     .json<UpdateMyInfoResponse>();
 }

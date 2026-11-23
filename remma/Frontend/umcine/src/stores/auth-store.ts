@@ -5,7 +5,7 @@ export const AUTH_STORE_KEY = "umcine-auth-store";
 
 interface AuthStore {
   accessToken: string | null;
-  setAccessToken: (accessToken: string) => void;
+  setAccessToken: (accessToken: string | null) => void;
   clearAuth: () => void;
 }
 

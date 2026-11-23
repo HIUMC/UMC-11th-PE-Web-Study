@@ -10,6 +10,7 @@ export interface MemberResult {
   memberId: number;
   email: string;
   nickname: string;
+  createdAt?: string;
 }
 
 export interface SignupResponse {

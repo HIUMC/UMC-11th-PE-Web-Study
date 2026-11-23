@@ -9,7 +9,8 @@ export function useMyInfoQuery() {
   return useQuery({
     queryKey: myInfoQueryKey,
     queryFn: getMyInfo,
-    enabled: accessToken !== null,
+    enabled: Boolean(accessToken),
+    staleTime: 5 * 60 * 1000,
     // 401 등 인증 오류는 재시도해도 결과가 같으므로 바로 실패 처리해요.
     retry: false,
   });

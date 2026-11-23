@@ -32,8 +32,12 @@ export default function MovieCard({ movie }: MovieCardProps) {
           )}
         </Link>
 
-        {/* 북마크 토글 버튼: Zustand 전역 상태 사용 */}
-        <BookmarkButton movieId={movie.id} variant="overlay" />
+        {/* 즐겨찾기 토글 버튼: 서버 즐겨찾기 API 연결 */}
+        <BookmarkButton
+          movieId={movie.id}
+          movieTitle={movie.title}
+          variant="overlay"
+        />
       </div>
 
       <div className="mt-2.5 flex flex-col">

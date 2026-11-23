@@ -6,10 +6,10 @@ export const Route = createFileRoute("/login")({
   validateSearch: (search): { redirect?: string } => ({
     redirect: typeof search.redirect === "string" ? search.redirect : undefined,
   }),
-  // 이미 로그인한 상태라면 내 정보 페이지로 보내요.
+  // 이미 로그인한 상태라면 홈으로 이동해요.
   beforeLoad: () => {
     if (isAuthenticated()) {
-      throw redirect({ to: "/me" });
+      throw redirect({ to: "/" });
     }
   },
   component: LoginPage,

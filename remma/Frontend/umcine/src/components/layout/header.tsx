@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { useMyInfoQuery } from "../../hooks/use-my-info-query";
 import { useLogout } from "../../hooks/use-logout";
+import { useMyInfoQuery } from "../../hooks/use-my-info-query";
 import { useAuthStore } from "../../stores/auth-store";
 
 export function Header() {
@@ -15,15 +15,28 @@ export function Header() {
         <div className="flex items-center gap-8">
           <Link to="/" className="flex shrink-0 items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg border-2 border-black bg-white">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                aria-hidden="true"
+              >
                 <rect x="2" y="3" width="20" height="18" rx="2" />
                 <path d="M7 3v18M17 3v18M2 8h20M2 16h20" />
               </svg>
             </div>
-            <span className="text-xl font-black tracking-tight text-gray-950">UMCine</span>
+            <span className="text-xl font-black tracking-tight text-gray-950">
+              UMCine
+            </span>
           </Link>
 
-          <nav className="flex items-center gap-6 whitespace-nowrap">
+          <nav
+            aria-label="주요 메뉴"
+            className="flex items-center gap-6 whitespace-nowrap"
+          >
             <Link
               to="/"
               activeOptions={{ exact: true }}
@@ -43,9 +56,16 @@ export function Header() {
             >
               영화 검색
             </Link>
-            <span className="cursor-pointer text-sm font-medium text-gray-500 hover:text-gray-900">
+            <Link
+              to="/me"
+              hash="ratings"
+              className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+              activeProps={{
+                className: "font-bold text-gray-950",
+              }}
+            >
               내 평점
-            </span>
+            </Link>
           </nav>
         </div>
 
@@ -56,39 +76,21 @@ export function Header() {
             aria-label="영화 검색"
             className="text-gray-600 transition-colors hover:text-gray-950"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              aria-hidden="true"
+            >
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
           </Link>
 
-          {accessToken ? (
-            <>
-              {/* 로그인 상태: 내 정보 이동 + 로그아웃 */}
-              <Link
-                to="/me"
-                className="flex items-center gap-2 text-sm font-medium text-gray-700 transition-colors hover:text-gray-950"
-                activeProps={{ className: "font-bold text-gray-950" }}
-              >
-                <span
-                  aria-hidden="true"
-                  className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white"
-                >
-                  {myInfoQuery.data?.nickname.charAt(0).toUpperCase() ?? "?"}
-                </span>
-                <span className="max-w-[8rem] truncate">
-                  {myInfoQuery.data ? `${myInfoQuery.data.nickname}님` : "내 정보"}
-                </span>
-              </Link>
-              <button
-                type="button"
-                onClick={logout}
-                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
-              >
-                로그아웃
-              </button>
-            </>
-          ) : (
+          {!accessToken ? (
             <>
               {/* 로그아웃 상태: 로그인 + 회원가입 */}
               <Link
@@ -103,6 +105,38 @@ export function Header() {
               >
                 회원가입
               </Link>
+            </>
+          ) : myInfoQuery.isLoading ? (
+            /* 실제 첫 내 정보 조회 요청 중일 때만 로딩 표시 (isPending이 아닌 isLoading 사용) */
+            <span
+              aria-hidden="true"
+              className="h-9 w-24 animate-pulse rounded-lg bg-gray-200"
+            />
+          ) : (
+            <>
+              {/* 로그인 상태: 마이페이지 이동 + 로그아웃 */}
+              <Link
+                to="/me"
+                className="flex items-center gap-2 text-sm font-medium text-gray-700 transition-colors hover:text-gray-950"
+                activeProps={{ className: "font-bold text-gray-950" }}
+              >
+                <span
+                  aria-hidden="true"
+                  className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white"
+                >
+                  {myInfoQuery.data?.nickname.charAt(0).toUpperCase() ?? "?"}
+                </span>
+                <span className="max-w-[8rem] truncate">
+                  {myInfoQuery.data ? `${myInfoQuery.data.nickname}님` : "마이페이지"}
+                </span>
+              </Link>
+              <button
+                type="button"
+                onClick={logout}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+              >
+                로그아웃
+              </button>
             </>
           )}
         </div>

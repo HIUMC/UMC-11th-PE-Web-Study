@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:umc_movie;MODE=MySQL;NON_KEYWORDS=MEMBER;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+  sql:
+    init:
+      mode: never
+
+jwt:
+  # 공개된 테스트 전용 32-byte Base64 키. 운영·MySQL 실행에서는 사용하지 않는다.
+  secret: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+  access-expiration: 3600
+
+springdoc:
+  swagger-ui:
+    persist-authorization: false

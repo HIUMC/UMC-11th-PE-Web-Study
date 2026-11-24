@@ -1,0 +1,28 @@
+"use client";
+
+import { useEffect, useSyncExternalStore } from "react";
+import { useRouter } from "next/navigation";
+import { LoginPage } from "../../screens/auth/login-page";
+import { useAuthStore } from "../../stores/auth-store";
+
+export default function LoginRoutePage() {
+  const router = useRouter();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const hasHydrated = useSyncExternalStore(
+    (onStoreChange) => useAuthStore.persist.onFinishHydration(onStoreChange),
+    () => useAuthStore.persist.hasHydrated(),
+    () => false,
+  );
+
+  useEffect(() => {
+    if (hasHydrated && accessToken) {
+      router.replace("/");
+    }
+  }, [hasHydrated, accessToken, router]);
+
+  if (!hasHydrated || accessToken) {
+    return null;
+  }
+
+  return <LoginPage />;
+}

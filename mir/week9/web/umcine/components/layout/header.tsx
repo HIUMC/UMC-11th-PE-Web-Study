@@ -1,0 +1,101 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { getMe } from "../../api/members/me";
+import { useAuthStore } from "../../stores/auth-store";
+import { cn } from "../../utils/cn";
+
+export function Header() {
+  const pathname = usePathname();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const meQuery = useQuery({
+    queryKey: ["members", "me"],
+    queryFn: getMe,
+    enabled: Boolean(accessToken),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
+
+  return (
+    <header className="flex h-[91px] items-center border-b border-[#E3E6EB] bg-white px-5 md:px-[80px]">
+      <div className="mx-auto flex w-full max-w-[1440px] items-center justify-between">
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center gap-2 no-underline">
+            <img
+              src="/icons/movie.svg"
+              alt="UMCINE 로고"
+              className="h-8 w-8 rounded-lg border-2 border-[#17191E] p-0.5"
+            />
+            <span className="text-xl font-black tracking-[-0.7px] text-[#17191E]">
+              UMCINE
+            </span>
+          </Link>
+
+          <nav className="flex items-center gap-6">
+            <Link
+              href="/"
+              className={cn(
+                "text-sm font-bold text-[#606774] transition-all duration-150 ease-in-out hover:text-[#17191E] hover:underline",
+                pathname === "/" && "text-[#17191E] underline",
+              )}
+            >
+              영화
+            </Link>
+            <Link
+              href="/search"
+              className={cn(
+                "text-sm font-bold text-[#606774] transition-all duration-150 ease-in-out hover:text-[#17191E] hover:underline",
+                pathname.startsWith("/search") && "text-[#17191E] underline",
+              )}
+            >
+              검색
+            </Link>
+            <Link
+              href="/my"
+              className={cn(
+                "text-sm font-bold text-[#606774] transition-all duration-150 ease-in-out hover:text-[#17191E] hover:underline",
+                pathname.startsWith("/my") && "text-[#17191E] underline",
+              )}
+            >
+              내 정보
+            </Link>
+          </nav>
+        </div>
+
+        <div className="flex items-center gap-2.5">
+          <Link
+            href="/search"
+            className="flex h-[42px] w-[42px] items-center justify-center rounded-lg border border-[#E3E6EB] bg-white transition-colors duration-200 hover:bg-[#F6F7F9]"
+            aria-label="검색 페이지로 이동"
+          >
+            <img
+              src="/icons/search.svg"
+              alt="검색 아이콘"
+              className="h-6 w-6"
+            />
+          </Link>
+
+          {!accessToken ? (
+            <Link
+              href="/login"
+              className="flex h-[42px] w-[71px] items-center justify-center rounded-lg bg-[#2563EB] text-sm font-extrabold text-white no-underline transition-colors duration-200 hover:bg-[#1d4ed8]"
+            >
+              로그인
+            </Link>
+          ) : meQuery.isLoading ? (
+            <span className="h-[42px] w-[96px] animate-pulse rounded-lg bg-gray-200" />
+          ) : (
+            <Link
+              href="/my"
+              className="flex h-[42px] items-center justify-center rounded-lg bg-[#2563EB] px-4 text-sm font-extrabold text-white no-underline transition-colors duration-200 hover:bg-[#1d4ed8]"
+            >
+              마이페이지
+            </Link>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+}

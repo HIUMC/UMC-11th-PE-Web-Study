@@ -117,6 +117,7 @@ body {
   display: block;
 
   width: 100%;
+  height: auto;
   aspect-ratio: 0.88;
 
   object-fit: cover;
@@ -259,6 +260,7 @@ body {
 .detail-backdrop {
   display: block;
   width: 100%;
+  height: auto;
   max-height: 360px;
   object-fit: cover;
   margin: 20px 0;
@@ -273,6 +275,7 @@ body {
 
 .detail-poster {
   width: 240px;
+  height: auto;
   border-radius: 8px;
 }
 

@@ -1,4 +1,4 @@
-import { tmdbClient } from "../tmdb-client";
+import { getTmdbClient } from "../tmdb-client";
 import type { TmdbMovieListResponse } from "./models";
 
 interface GetMoviesRequest {
@@ -8,7 +8,7 @@ interface GetMoviesRequest {
 type GetMoviesResponse = TmdbMovieListResponse;
 
 function getMovies({ page = 1 }: GetMoviesRequest = {}) {
-  return tmdbClient
+  return getTmdbClient()
     .get("movie/popular", {
       searchParams: { language: "ko-KR", page },
     })

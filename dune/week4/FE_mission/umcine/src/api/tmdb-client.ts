@@ -1,9 +1,14 @@
+import "server-only";
 import ky from "ky";
-import { env } from "../config/env";
+import { getTmdbEnv } from "../config/env";
 
-export const tmdbClient = ky.create({
-  baseUrl: `${env.tmdbApiBaseUrl}/`,
-  headers: {
-    Authorization: `Bearer ${env.tmdbAccessToken}`,
-  },
-});
+export function getTmdbClient() {
+  const { tmdbApiBaseUrl, tmdbAccessToken } = getTmdbEnv();
+
+  return ky.create({
+    baseUrl: `${tmdbApiBaseUrl}/`,
+    headers: {
+      Authorization: `Bearer ${tmdbAccessToken}`,
+    },
+  });
+}

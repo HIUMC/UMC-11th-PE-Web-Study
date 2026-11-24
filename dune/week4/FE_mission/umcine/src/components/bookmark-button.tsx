@@ -1,3 +1,6 @@
+"use client";
+
+import Image from "next/image";
 import { useBookmarkStore } from "../stores/bookmark-store";
 
 interface BookmarkButtonProps {
@@ -25,13 +28,16 @@ export default function BookmarkButton({
       onClick={() => toggleBookmark(movieId)}
     >
       {variant === "icon" ? (
-        <img
+        <Image
           src={
             isBookmarked
               ? "/icons/movie-icons/bookmark.svg"
               : "/icons/movie-icons/bookmark-outline.svg"
           }
           alt=""
+          width={32}
+          height={32}
+          unoptimized
         />
       ) : (
         isBookmarked ? "북마크 해제" : "북마크 추가"

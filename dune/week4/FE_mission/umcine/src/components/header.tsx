@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import Link from "next/link";
 
 export default function Header() {
   return (
@@ -8,15 +8,15 @@ export default function Header() {
           <strong className="logo">🎞 UMCine</strong>
 
           <nav className="nav">
-            <Link to="/">영화</Link>
-            <Link to="/search">검색</Link>
+            <Link href="/">영화</Link>
+            <Link href="/search">검색</Link>
             <span>내 정보</span>
           </nav>
         </div>
 
         <div className="header-right">
           <Link
-            to="/search"
+            href="/search"
             className="search-button"
             aria-label="영화 검색"
           >

@@ -1,4 +1,4 @@
-import { tmdbClient } from "../tmdb-client";
+import { getTmdbClient } from "../tmdb-client";
 import type { TmdbMovieListResponse } from "./models";
 
 interface SearchMoviesRequest {
@@ -9,7 +9,7 @@ interface SearchMoviesRequest {
 type SearchMoviesResponse = TmdbMovieListResponse;
 
 function searchMovies({ query, page = 1 }: SearchMoviesRequest) {
-  return tmdbClient
+  return getTmdbClient()
     .get("search/movie", {
       searchParams: {
         query,

@@ -1,10 +1,10 @@
-import { tmdbClient } from "../tmdb-client";
+import { getTmdbClient } from "../tmdb-client";
 import type { TmdbMovieDetail } from "./models";
 
 type GetMovieDetailResponse = TmdbMovieDetail;
 
 function getMovieDetail(movieId: number) {
-  return tmdbClient
+  return getTmdbClient()
     .get(`movie/${movieId}`, {
       searchParams: { language: "ko-KR" },
     })

@@ -10,6 +10,8 @@ import com.umc.movie.exception.ApiException;
 import com.umc.movie.repository.MemberRepository;
 import com.umc.movie.repository.RatingRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,8 +45,7 @@ public class RatingService {
                         "해당 회원을 찾을 수 없습니다."));
 
         if (ratingRepository.existsByMember_MemberIdAndMovieId(memberId, request.movieId())) {
-            throw new ApiException(HttpStatus.CONFLICT, "RATING409_1",
-                    "이미 이 영화에 평점을 남기셨습니다.");
+            throw duplicateRating();
         }
 
         Rating rating = Rating.builder()
@@ -54,7 +55,15 @@ public class RatingService {
                 .comment(request.comment())
                 .build();
 
-        return RatingResponse.from(ratingRepository.save(rating));
+        try {
+            return RatingResponse.from(ratingRepository.save(rating));
+        } catch (DataIntegrityViolationException exception) {
+            if (exception.getCause() instanceof ConstraintViolationException violation
+                    && violation.getKind() == ConstraintViolationException.ConstraintKind.UNIQUE) {
+                throw duplicateRating();
+            }
+            throw exception;
+        }
     }
 
     @Transactional
@@ -90,5 +99,10 @@ public class RatingService {
         }
 
         return rating;
+    }
+
+    private ApiException duplicateRating() {
+        return new ApiException(HttpStatus.CONFLICT, "RATING409_1",
+                "이미 이 영화에 평점을 남기셨습니다.");
     }
 }

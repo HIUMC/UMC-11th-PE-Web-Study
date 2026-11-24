@@ -45,20 +45,29 @@ class RatingServiceTests {
     }
 
     @Test
-    void anotherMemberCannotUpdateOrDelete() {
+    void updatingAnotherMembersRatingThrowsRating403_1() {
         Rating rating = storedRating();
         when(ratings.findById(202L)).thenReturn(Optional.of(rating));
-        ApiException update = assertThrows(ApiException.class,
+
+        ApiException error = assertThrows(ApiException.class,
                 () -> service.update(303L, 202L, new UpdateRatingRequest(1, "forbidden")));
-        ApiException delete = assertThrows(ApiException.class,
-                () -> service.delete(303L, 202L));
-        for (ApiException error : new ApiException[]{update, delete}) {
-            assertEquals(HttpStatus.FORBIDDEN, error.getStatus());
-            assertEquals("RATING403_1", error.getCode());
-        }
+
+        assertEquals(HttpStatus.FORBIDDEN, error.getStatus());
+        assertEquals("RATING403_1", error.getCode());
         assertEquals(3, rating.getScore());
         assertEquals("original", rating.getComment());
         verify(ratings, never()).save(any(Rating.class));
+    }
+
+    @Test
+    void deletingAnotherMembersRatingThrowsRating403_1() {
+        Rating rating = storedRating();
+        when(ratings.findById(202L)).thenReturn(Optional.of(rating));
+
+        ApiException error = assertThrows(ApiException.class, () -> service.delete(303L, 202L));
+
+        assertEquals(HttpStatus.FORBIDDEN, error.getStatus());
+        assertEquals("RATING403_1", error.getCode());
         verify(ratings, never()).delete(any(Rating.class));
     }
 
@@ -80,7 +89,7 @@ class RatingServiceTests {
     }
 
     @Test
-    void duplicateMovieRatingIsRejected() {
+    void creatingDuplicateMovieRatingThrowsRating409_1() {
         when(members.findById(101L)).thenReturn(Optional.of(mock(Member.class)));
         when(ratings.existsByMember_MemberIdAndMovieId(101L, 1L)).thenReturn(true);
         ApiException error = assertThrows(ApiException.class,

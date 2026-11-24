@@ -1,4 +1,4 @@
-import { env } from "../../config/env";
+import { getTmdbEnv } from "../../config/env";
 import type { TmdbMovieListResponse } from "./models";
 
 type GetMoviesWithFetchResponse = TmdbMovieListResponse;
@@ -6,16 +6,17 @@ type GetMoviesWithFetchResponse = TmdbMovieListResponse;
 async function getMoviesWithFetch(
   page = 1,
 ): Promise<GetMoviesWithFetchResponse> {
+  const { tmdbApiBaseUrl, tmdbAccessToken } = getTmdbEnv();
   const searchParams = new URLSearchParams({
     language: "ko-KR",
     page: String(page),
   });
 
   const response = await fetch(
-    `${env.tmdbApiBaseUrl}/movie/popular?${searchParams}`,
+    `${tmdbApiBaseUrl}/movie/popular?${searchParams}`,
     {
       headers: {
-        Authorization: `Bearer ${env.tmdbAccessToken}`,
+        Authorization: `Bearer ${tmdbAccessToken}`,
       },
     },
   );

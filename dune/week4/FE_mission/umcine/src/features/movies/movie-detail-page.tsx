@@ -1,62 +1,28 @@
-import { Link, useParams } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import BookmarkButton from "../../components/bookmark-button";
+import Image from "next/image";
+import Link from "next/link";
 import { getMovieDetail } from "../../api/movies/get-movie-detail";
+import type { TmdbMovieDetail } from "../../api/movies/models";
+import BookmarkButton from "../../components/bookmark-button";
 import { getMovieDetailErrorMessage } from "../../utils/movies/get-movie-detail-error-message";
 import {
   getTmdbPosterUrl,
   getTmdbBackdropUrl,
 } from "../../utils/movies/tmdb-image";
 
-export function MovieDetailPage() {
-  const { movieId } = useParams({ from: "/movies/$movieId" });
-  const parsedMovieId = Number(movieId);
+export async function MovieDetailPage({ movieId }: { movieId: number }) {
+  if (!Number.isSafeInteger(movieId) || movieId < 1) {
+    return <DetailError message="올바르지 않은 영화 번호예요." />;
+  }
 
-  return <MovieDetail key={movieId} movieId={parsedMovieId} />;
-}
-
-function MovieDetail({ movieId }: { movieId: number }) {
-  const isValidId = Number.isInteger(movieId) && movieId > 0;
-
-  const movieDetailQuery = useQuery({
-    queryKey: ["movies", "detail", movieId],
-    queryFn: () => getMovieDetail(movieId),
-    enabled: isValidId,
-    staleTime: 30 * 1000, // 30초 동안 캐시 유지
-  });
-
-  const movie = movieDetailQuery.data;
-
-  if (
-    !isValidId ||
-    movieDetailQuery.isPending ||
-    movieDetailQuery.isError ||
-    !movie
-  ) {
-    const message = !isValidId
-      ? "올바르지 않은 영화 번호예요."
-      : movieDetailQuery.isPending
-        ? "영화 정보를 불러오는 중이에요."
-        : movieDetailQuery.isError
-          ? getMovieDetailErrorMessage(movieDetailQuery.error)
-          : "영화를 찾을 수 없어요.";
-
-    return (
-      <main className="main">
-        <div className="page-content">
-          <p role={isValidId && movieDetailQuery.isPending ? "status" : "alert"}>
-            {message}
-          </p>
-
-          <Link to="/">영화 목록으로 돌아가기</Link>
-        </div>
-      </main>
-    );
+  let movie: TmdbMovieDetail;
+  try {
+    movie = await getMovieDetail(movieId);
+  } catch (error) {
+    return <DetailError message={getMovieDetailErrorMessage(error)} />;
   }
 
   const posterUrl = getTmdbPosterUrl(movie.poster_path);
   const backdropUrl = getTmdbBackdropUrl(movie.backdrop_path);
-
   const runtime =
     typeof movie.runtime === "number"
       ? `${Math.floor(movie.runtime / 60)}시간 ${movie.runtime % 60}분`
@@ -65,14 +31,17 @@ function MovieDetail({ movieId }: { movieId: number }) {
   return (
     <main className="main">
       <div className="page-content">
-        <Link to="/">← 영화 목록</Link>
+        <Link href="/">← 영화 목록</Link>
 
         {backdropUrl ? (
-          <img
+          <Image
             className="detail-backdrop"
             src={backdropUrl}
             alt=""
             aria-hidden="true"
+            width={1280}
+            height={720}
+            sizes="(max-width: 1328px) calc(100vw - 48px), 1280px"
           />
         ) : (
           <div className="detail-backdrop image-placeholder">
@@ -82,10 +51,12 @@ function MovieDetail({ movieId }: { movieId: number }) {
 
         <div className="detail-content">
           {posterUrl ? (
-            <img
+            <Image
               className="detail-poster"
               src={posterUrl}
               alt={`${movie.title} 포스터`}
+              width={240}
+              height={360}
             />
           ) : (
             <div className="detail-poster image-placeholder">
@@ -105,6 +76,17 @@ function MovieDetail({ movieId }: { movieId: number }) {
             <BookmarkButton movieId={movie.id} />
           </div>
         </div>
+      </div>
+    </main>
+  );
+}
+
+function DetailError({ message }: { message: string }) {
+  return (
+    <main className="main">
+      <div className="page-content">
+        <p role="alert">{message}</p>
+        <Link href="/">영화 목록으로 돌아가기</Link>
       </div>
     </main>
   );

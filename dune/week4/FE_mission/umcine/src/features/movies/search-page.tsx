@@ -1,22 +1,27 @@
-import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import BookmarkButton from "../../components/bookmark-button";
-import { searchMovies } from "../../api/movies/search-movies";
+import { fetchMovieResults } from "../../api/movies/fetch-movie-results";
 import { getTmdbPosterUrl } from "../../utils/movies/tmdb-image";
 
 export function SearchPage() {
-  const { query } = useSearch({ from: "/search" });
+  const query = useSearchParams()?.get("query") ?? "";
 
-  return <SearchResults key={query ?? ""} query={query ?? ""} />;
+  return <SearchResults key={query} query={query} />;
 }
 
 function SearchResults({ query }: { query: string }) {
-  const navigate = useNavigate({ from: "/search" });
+  const router = useRouter();
   const normalizedQuery = query.trim();
 
   const searchQuery = useQuery({
     queryKey: ["movies", "search", { query: normalizedQuery }],
-    queryFn: () => searchMovies({ query: normalizedQuery }),
+    queryFn: ({ signal }) =>
+      fetchMovieResults("/api/movies/search", { query: normalizedQuery }, signal),
     enabled: normalizedQuery.length > 0,
   });
 
@@ -36,9 +41,8 @@ function SearchResults({ query }: { query: string }) {
             const formData = new FormData(event.currentTarget);
             const nextQuery = String(formData.get("query") ?? "").trim();
 
-            void navigate({
-              search: nextQuery ? { query: nextQuery } : {},
-            });
+            const params = new URLSearchParams({ query: nextQuery });
+            router.push(nextQuery ? `/search?${params}` : "/search");
           }}
         >
           <input
@@ -74,15 +78,14 @@ function SearchResults({ query }: { query: string }) {
 
                     return (
                       <li key={movie.id} className="search-result">
-                        <Link
-                          to="/movies/$movieId"
-                          params={{ movieId: String(movie.id) }}
-                        >
+                        <Link href={`/movies/${movie.id}`}>
                           {posterUrl ? (
-                            <img
+                            <Image
                               className="search-poster"
                               src={posterUrl}
                               alt={`${movie.title} 포스터`}
+                              width={120}
+                              height={180}
                             />
                           ) : (
                             <div className="search-poster image-placeholder">
@@ -93,10 +96,7 @@ function SearchResults({ query }: { query: string }) {
 
                         <div>
                           <h3>
-                            <Link
-                              to="/movies/$movieId"
-                              params={{ movieId: String(movie.id) }}
-                            >
+                            <Link href={`/movies/${movie.id}`}>
                               {movie.title}
                             </Link>
                           </h3>

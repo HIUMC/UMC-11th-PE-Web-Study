@@ -1,7 +1,9 @@
+"use client";
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import MovieGrid from "../../components/movie-grid";
-import { getMovies } from "../../api/movies/get-movies";
+import { fetchMovieResults } from "../../api/movies/fetch-movie-results";
 
 export function MovieListPage() {
   // 현재 페이지 번호만 직접 관리
@@ -10,7 +12,8 @@ export function MovieListPage() {
   // 영화 데이터, 로딩 상태, 오류 상태는 useQuery가 관리
   const moviesQuery = useQuery({
     queryKey: ["movies", "list", { page }],
-    queryFn: () => getMovies({ page }),
+    queryFn: ({ signal }) =>
+      fetchMovieResults("/api/movies", { page: String(page) }, signal),
   });
 
   const movies = moviesQuery.data?.results ?? [];

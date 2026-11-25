@@ -12,27 +12,64 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { CreateFavoriteDto } from '../dto/create-favorite.dto.js';
 import { AuthGuard } from '../guard/auth.guard.js';
 import { FavoriteService } from '../service/favorite.service.js';
 
-type AuthenticatedRequest = Request & {
-  memberId: number;
-};
-
+@ApiTags('즐겨찾기')
+@ApiBearerAuth('bearerAuth') // 이 컨트롤러의 모든 API가 토큰을 요구합니다
 @Controller('favorites')
 @UseGuards(AuthGuard)
 export class FavoriteController {
   constructor(private readonly favoriteService: FavoriteService) {}
 
+  @ApiOperation({
+    summary: '즐겨찾기 등록',
+    description: '토큰의 주인인 회원이 TMDB 영화 ID 하나를 즐겨찾기에 추가합니다.',
+  })
+  // NestJS는 컨트롤러가 돌려주는 객체의 모양을 실행 중에 알 수 없어서, 응답 예시를 직접 적어줍니다.
+  @ApiResponse({
+    status: 201,
+    description: '즐겨찾기 등록 성공',
+    schema: {
+      example: {
+        isSuccess: true,
+        code: 'COMMON201',
+        message: '즐겨찾기를 등록했습니다.',
+        result: { favoriteId: 1, movieId: 550, createdAt: '2026-09-13T21:00:00.000Z' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: '토큰이 없거나 유효하지 않음',
+    schema: {
+      example: {
+        isSuccess: false,
+        code: 'AUTH401_2',
+        message: '로그인이 필요한 요청입니다.',
+        result: null,
+      },
+    },
+  })
+  @ApiResponse({
+    status: 409,
+    description: '이미 즐겨찾기한 영화',
+    schema: {
+      example: {
+        isSuccess: false,
+        code: 'FAVORITE409_1',
+        message: '이미 이 영화를 즐겨찾기하셨습니다.',
+        result: null,
+      },
+    },
+  })
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(
-    @Req() request: AuthenticatedRequest,
-    @Body() dto: CreateFavoriteDto,
-  ) {
-    const memberId = request.memberId;
+  async create(@Req() request: Request, @Body() dto: CreateFavoriteDto) {
+    const memberId = (request as Request & { memberId: number }).memberId;
     const result = await this.favoriteService.create(memberId, dto);
 
     return {
@@ -43,10 +80,10 @@ export class FavoriteController {
     };
   }
 
+  @ApiOperation({ summary: '내 즐겨찾기 목록 조회' })
   @Get()
-  @HttpCode(HttpStatus.OK)
-  async getMyFavorites(@Req() request: AuthenticatedRequest) {
-    const memberId = request.memberId;
+  async getMyFavorites(@Req() request: Request) {
+    const memberId = (request as Request & { memberId: number }).memberId;
     const result = await this.favoriteService.getMyFavorites(memberId);
 
     return {
@@ -57,13 +94,13 @@ export class FavoriteController {
     };
   }
 
+  @ApiOperation({ summary: '즐겨찾기 여부 조회' })
   @Get(':movieId')
-  @HttpCode(HttpStatus.OK)
   async getStatus(
-    @Req() request: AuthenticatedRequest,
+    @Req() request: Request,
     @Param('movieId', ParseIntPipe) movieId: number,
   ) {
-    const memberId = request.memberId;
+    const memberId = (request as Request & { memberId: number }).memberId;
     const result = await this.favoriteService.getStatus(memberId, movieId);
 
     return {
@@ -74,13 +111,13 @@ export class FavoriteController {
     };
   }
 
+  @ApiOperation({ summary: '즐겨찾기 해제' })
   @Delete(':movieId')
-  @HttpCode(HttpStatus.OK)
   async delete(
-    @Req() request: AuthenticatedRequest,
+    @Req() request: Request,
     @Param('movieId', ParseIntPipe) movieId: number,
   ) {
-    const memberId = request.memberId;
+    const memberId = (request as Request & { memberId: number }).memberId;
     await this.favoriteService.delete(memberId, movieId);
 
     return {

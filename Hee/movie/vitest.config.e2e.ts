@@ -7,5 +7,8 @@ export default defineConfig({
     globals: true,
     root: './',
     include: ['**/*.e2e-spec.ts'],
+    server: {
+      deps: { inline: ['@nestjs/jwt'] },
+    },
   },
 });

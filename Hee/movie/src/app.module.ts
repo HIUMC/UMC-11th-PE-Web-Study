@@ -3,6 +3,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AppController } from './app.controller.js';
+import { AppService } from './app.service.js';
 import { AuthController } from './controller/auth.controller.js';
 import { FavoriteController } from './controller/favorite.controller.js';
 import { MemberController } from './controller/member.controller.js';
@@ -43,6 +45,7 @@ import { RatingService } from './service/rating.service.js';
     }),
   ],
   controllers: [
+    AppController,
     AuthController,
     MemberController,
     RatingController,
@@ -50,6 +53,7 @@ import { RatingService } from './service/rating.service.js';
     MovieRecordController,
   ],
   providers: [
+    AppService,
     AuthService,
     MemberService,
     RatingService,

@@ -11,6 +11,7 @@ import {
   Req,
   UseGuards,
 } from "@nestjs/common";
+import { ApiBearerAuth, ApiOperation, ApiTags } from "@nestjs/swagger";
 import type { Request } from "express";
 
 import { AuthGuard } from "../guard/auth.guard.js";
@@ -22,6 +23,7 @@ type AuthenticatedRequest = Request & {
   memberId: number;
 };
 
+@ApiTags("회원")
 @Controller("members")
 export class MemberController {
   constructor(private readonly memberService: MemberService) {}
@@ -36,6 +38,11 @@ export class MemberController {
     return this.memberService.checkEmail(email);
   }
 
+  @ApiOperation({
+    summary: "회원가입",
+    description:
+      "이메일, 비밀번호, 닉네임으로 회원을 등록합니다. 토큰이 없어도 호출할 수 있는 공개 API입니다.",
+  })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async signUp(@Body() dto: CreateMemberDto) {
@@ -50,6 +57,8 @@ export class MemberController {
   }
 
   // 내 정보 조회
+  @ApiOperation({ summary: "내 정보 조회" })
+  @ApiBearerAuth("bearerAuth")
   @Get("me")
   @UseGuards(AuthGuard)
   async getMyInfo(@Req() request: AuthenticatedRequest) {
@@ -64,6 +73,8 @@ export class MemberController {
   }
 
   // 내 정보 수정
+  @ApiOperation({ summary: "내 정보 수정" })
+  @ApiBearerAuth("bearerAuth")
   @Patch("me")
   @UseGuards(AuthGuard)
   async updateMyInfo(
@@ -82,4 +93,5 @@ export class MemberController {
       result,
     };
   }
+  
 }

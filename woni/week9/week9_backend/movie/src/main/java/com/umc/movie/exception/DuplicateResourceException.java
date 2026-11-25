@@ -1,0 +1,15 @@
+// src/main/java/com/umc/movie/exception/DuplicateResourceException.java
+package com.umc.movie.exception;
+
+public class DuplicateResourceException extends RuntimeException {
+    private final String code;
+
+    public DuplicateResourceException(String code, String message) {
+        super(message);
+        this.code = code;
+    }
+
+    public String getCode() {
+        return code;
+    }
+}

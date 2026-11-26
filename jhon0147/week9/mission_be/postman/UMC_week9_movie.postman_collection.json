@@ -1,0 +1,734 @@
+{
+  "info": {
+    "_postman_id": "9a07ce8a-32dc-4c18-94f4-692bb5fb8309",
+    "name": "UMC 9주차 백엔드 - Swagger와 테스트",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "01~17 순서대로 실행. Swagger 제출 캡처는 브라우저에서 별도로 진행. 16~17은 사전 중복 거절 확인이며, 저장 후 rollback은 MovieRecordTransactionTest로 검증."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessTokenA}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8088",
+      "type": "string"
+    },
+    {
+      "key": "emailA",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "emailB",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "nicknameA",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "nicknameB",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "memberIdA",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "memberIdB",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "accessTokenA",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "accessTokenB",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ratingIdA",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 회원가입 A",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/members",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{emailA}}\",\n  \"nickname\": \"{{nicknameA}}\",\n  \"password\": \"Umc!1234\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const runId = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);",
+              "for (const key of [\"accessTokenA\", \"accessTokenB\", \"memberIdA\", \"memberIdB\"]) pm.collectionVariables.unset(key);",
+              "pm.collectionVariables.set(\"emailA\", \"week9-a-\" + runId + \"@umc.test\");",
+              "pm.collectionVariables.set(\"emailB\", \"week9-b-\" + runId + \"@umc.test\");",
+              "pm.collectionVariables.set(\"nicknameA\", \"가\" + runId.slice(-10));",
+              "pm.collectionVariables.set(\"nicknameB\", \"나\" + runId.slice(-10));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.test(\"공통 응답 코드\", () => { pm.expect(body.code).to.eql(\"COMMON201\"); pm.expect(body.isSuccess).to.eql(true); });",
+              "pm.collectionVariables.set(\"memberIdA\", String(body.result.memberId));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 회원가입 B",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/members",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{emailB}}\",\n  \"nickname\": \"{{nicknameB}}\",\n  \"password\": \"Umc!1234\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.test(\"공통 응답 코드\", () => { pm.expect(body.code).to.eql(\"COMMON201\"); pm.expect(body.isSuccess).to.eql(true); });",
+              "pm.collectionVariables.set(\"memberIdB\", String(body.result.memberId));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 로그인 A",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{emailA}}\",\n  \"password\": \"Umc!1234\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"공통 응답 코드\", () => { pm.expect(body.code).to.eql(\"COMMON200\"); pm.expect(body.isSuccess).to.eql(true); });",
+              "pm.test(\"토큰 발급\", () => { pm.expect(body.result.accessToken).to.be.a(\"string\").and.not.empty; });",
+              "pm.collectionVariables.set(\"accessTokenA\", body.result.accessToken);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 로그인 B",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{emailB}}\",\n  \"password\": \"Umc!1234\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"공통 응답 코드\", () => { pm.expect(body.code).to.eql(\"COMMON200\"); pm.expect(body.isSuccess).to.eql(true); });",
+              "pm.test(\"토큰 발급\", () => { pm.expect(body.result.accessToken).to.be.a(\"string\").and.not.empty; });",
+              "pm.collectionVariables.set(\"accessTokenB\", body.result.accessToken);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 OpenAPI 문서는 토큰 없이 조회",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/v3/api-docs"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const doc = pm.response.json();",
+              "pm.test(\"보호 API 자물쇠\", () => pm.expect(doc.paths[\"/favorites\"].post.security[0]).to.have.property(\"bearerAuth\"));",
+              "pm.test(\"공개 로그인\", () => pm.expect(doc.paths[\"/auth/login\"].post.security || []).to.have.lengthOf(0));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 토큰 없이 즐겨찾기 등록 401",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/favorites",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"movieId\": 550\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "const body = pm.response.json();",
+              "pm.test(\"응답 코드 AUTH401_2\", () => pm.expect(body.code).to.eql(\"AUTH401_2\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 등록 전 즐겨찾기 여부 false",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessTokenA}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/favorites/550"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"응답 코드 COMMON200\", () => pm.expect(body.code).to.eql(\"COMMON200\"));",
+              "pm.test(\"미등록 false\", () => pm.expect(body.result.isFavorite).to.eql(false));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "08 즐겨찾기 등록 201",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessTokenA}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/favorites",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"movieId\": 550\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.test(\"응답 코드 COMMON201\", () => pm.expect(body.code).to.eql(\"COMMON201\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "09 즐겨찾기 중복 409",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessTokenA}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/favorites",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"movieId\": 550\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "const body = pm.response.json();",
+              "pm.test(\"응답 코드 FAVORITE409_1\", () => pm.expect(body.code).to.eql(\"FAVORITE409_1\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10 토큰 없이 평점 등록 401",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/ratings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"movieId\": 550,\n  \"score\": 5\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 401\", () => pm.response.to.have.status(401));",
+              "const body = pm.response.json();",
+              "pm.test(\"응답 코드 AUTH401_2\", () => pm.expect(body.code).to.eql(\"AUTH401_2\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11 평점 등록 201",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessTokenA}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/ratings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"movieId\": 550,\n  \"score\": 5,\n  \"comment\": \"9주차 테스트\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.test(\"응답 코드 COMMON201\", () => pm.expect(body.code).to.eql(\"COMMON201\"));",
+              "pm.collectionVariables.set(\"ratingIdA\", String(body.result.ratingId));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12 평점 중복 409",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessTokenA}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/ratings",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"movieId\": 550,\n  \"score\": 4\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "const body = pm.response.json();",
+              "pm.test(\"응답 코드 RATING409_1\", () => pm.expect(body.code).to.eql(\"RATING409_1\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13 B가 A의 평점 수정 403",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessTokenB}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/ratings/{{ratingIdA}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"score\": 3,\n  \"comment\": \"수정 시도\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 403\", () => pm.response.to.have.status(403));",
+              "const body = pm.response.json();",
+              "pm.test(\"응답 코드 RATING403_1\", () => pm.expect(body.code).to.eql(\"RATING403_1\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "14 공개 회원별 평점 조회",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/members/{{memberIdA}}/ratings"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"응답 코드 COMMON200\", () => pm.expect(body.code).to.eql(\"COMMON200\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "15 영화 680 즐겨찾기 등록",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessTokenA}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/favorites",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"movieId\": 680\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 201\", () => pm.response.to.have.status(201));",
+              "const body = pm.response.json();",
+              "pm.test(\"응답 코드 COMMON201\", () => pm.expect(body.code).to.eql(\"COMMON201\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "16 영화 기록은 중복 즐겨찾기로 거절",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessTokenA}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/movie-records",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"movieId\": 680,\n  \"score\": 5,\n  \"addToFavorites\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 409\", () => pm.response.to.have.status(409));",
+              "const body = pm.response.json();",
+              "pm.test(\"응답 코드 FAVORITE409_1\", () => pm.expect(body.code).to.eql(\"FAVORITE409_1\"));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "17 실패한 영화 680 평점이 없는지 확인",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": {
+          "type": "noauth"
+        },
+        "url": "{{baseUrl}}/members/{{memberIdA}}/ratings"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"HTTP 200\", () => pm.response.to.have.status(200));",
+              "const body = pm.response.json();",
+              "pm.test(\"응답 코드 COMMON200\", () => pm.expect(body.code).to.eql(\"COMMON200\"));",
+              "pm.test(\"평점은 550 하나만 존재\", () => { pm.expect(body.result).to.have.lengthOf(1); pm.expect(body.result[0].movieId).to.eql(550); });"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

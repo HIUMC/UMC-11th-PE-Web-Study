@@ -1,0 +1,43 @@
+{
+  "tests": 17,
+  "failures": 0,
+  "errors": 0,
+  "suites": [
+    {
+      "name": "com.umc.movie.AuthFlowTests",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "name": "com.umc.movie.MovieApplicationTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "name": "com.umc.movie.MovieRecordTests",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "name": "com.umc.movie.OpenApiTests",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "name": "com.umc.movie.RatingApiTests",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "name": "com.umc.movie.service.RatingServiceTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    }
+  ]
+}
